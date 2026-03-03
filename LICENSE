@@ -1,45 +1,121 @@
-Non-Commercial Use License
+# Vibe Music App 许可协议
 
-Copyright (c) 2026 Vibe Music App Contributors
+版权所有 © 2026 AmisKwok. 保留所有权利。
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 许可协议概述
 
-1. The above copyright notice and this permission notice shall be included in all
-   copies or substantial portions of the Software.
+本项目采用 **知识共享 署名-非商业性使用-相同方式共享 4.0 国际许可协议 (CC BY-NC-SA 4.0)**。
 
-2. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.
+简单来说，你可以：
+- ✅ **自由分享**：复制、分发本项目的代码和文档
+- ✅ **自由修改**：基于本项目进行二次开发和创作
 
-3. COMMERCIAL USE PROHIBITED: This Software may not be used, modified, or distributed
-   for commercial purposes, including but not limited to:
-   - Selling or licensing the Software or derivatives thereof
-   - Using the Software in a commercial product or service
-   - Using the Software to generate revenue
-   - Using the Software for any other commercial purpose
+## 使用条件
 
-4. PERSONAL AND NON-COMMERCIAL USE ONLY: The Software may only be used for personal,
-   educational, research, or other non-commercial purposes.
+### 1. 署名要求
+你必须：
+- 保留原始版权声明
+- 提供指向本许可协议的链接
+- 说明你是否对原始作品进行了修改
+- 不得以任何方式暗示 AmisKwok 为你或你的使用背书
 
-5. ATTRIBUTION REQUIRED: Any redistribution of the Software or derivatives thereof
-   must include this license file and retain the original copyright notice.
+### 2. 非商业性使用
+本项目**仅供学习、研究和个人使用**，**严禁任何商业用途**，包括但不限于：
+- ❌ 销售本软件或其修改版本
+- ❌ 将本软件用于商业产品或服务
+- ❌ 通过本软件直接或间接获取商业利益
+- ❌ 在商业环境中部署或使用本软件
 
-6. NO WARRANTY: The Software is provided "as is", without warranty of any kind,
-   express or implied, including but not limited to the warranties of
-   merchantability, fitness for a particular purpose and noninfringement. In no event
-   shall the authors or copyright holders be liable for any claim, damages or other
-   liability, whether in an action of contract, tort or otherwise, arising from,
-   out of or in connection with the Software or the use or other dealings in the
-   Software.
+### 3. 相同方式共享
+如果你基于本项目进行修改、转换或创作，你必须：
+- 使用与本协议**相同的许可协议**分发你的衍生作品
+- 保留本协议的所有条款
 
-By using, modifying, or distributing the Software, you agree to be bound by
-the terms of this license.
+### 4. 无附加限制
+你不得：
+- 添加任何法律条款或技术措施限制他人行使本协议允许的权利
+
+## 免责声明
+
+本软件按"**原样**"提供，**不提供任何形式的明示或暗示担保**，包括但不限于：
+- 适销性担保
+- 特定用途适用性担保
+- 非侵权担保
+
+AmisKwok 不对因使用本软件造成的任何直接或间接损失承担责任。
+
+## 完整协议
+
+本协议是 CC BY-NC-SA 4.0 国际许可协议的简化说明。完整的法律文本请参阅：
+
+- 中文完整版：https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.zh-Hans
+- 英文完整版：https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+## 联系方式
+
+如有任何疑问，请通过以下方式联系：
+- GitHub 仓库：https://github.com/AmisKwok/vibe-music-app
+- Gitee 仓库：https://gitee.com/AmisKwok/vibe-music-app
+- 作者：AmisKwok
+
+---
+
+# Vibe Music App License
+
+Copyright © 2026 AmisKwok. All rights reserved.
+
+## License Overview
+
+This project is licensed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0)**.
+
+In simple terms, you can:
+- ✅ **Share freely**: Copy and distribute the code and documentation
+- ✅ **Adapt freely**: Remix, transform, and build upon the project
+
+## Terms of Use
+
+### 1. Attribution
+You must:
+- Retain the original copyright notice
+- Provide a link to this license
+- Indicate if changes were made
+- Not imply that AmisKwok endorses you or your use
+
+### 2. Non-Commercial Use
+This project is **for learning, research, and personal use only**. **Commercial use is strictly prohibited**, including but not limited to:
+- ❌ Selling this software or modified versions
+- ❌ Using this software in commercial products or services
+- ❌ Obtaining commercial benefits directly or indirectly through this software
+- ❌ Deploying or using this software in commercial environments
+
+### 3. ShareAlike
+If you remix, transform, or build upon this project, you must:
+- Distribute your contributions under the **same license** as the original
+- Retain all terms of this license
+
+### 4. No Additional Restrictions
+You may not:
+- Apply legal terms or technological measures that legally restrict others from doing anything the license permits
+
+## Disclaimer
+
+This software is provided **"as is"** without **any warranty of any kind**, express or implied, including but not limited to:
+- Warranties of merchantability
+- Fitness for a particular purpose
+- Non-infringement
+
+AmisKwok shall not be liable for any direct or indirect damages arising from the use of this software.
+
+## Full License
+
+This is a simplified summary of the CC BY-NC-SA 4.0 International License. For the complete legal text, see:
+
+- Full Chinese text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.zh-Hans
+- Full English text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+## Contact
+
+For any questions, please contact:
+- GitHub Repository: https://github.com/AmisKwok/vibe-music-app
+- Gitee Repository: https://gitee.com/AmisKwok/vibe-music-app
+- Author: AmisKwok
