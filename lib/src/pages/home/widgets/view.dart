@@ -11,6 +11,7 @@ import 'package:vibe_music_app/src/pages/home/components/profile_page.dart';
 import 'package:vibe_music_app/src/pages/home/components/currently_playing_bar.dart';
 import 'package:vibe_music_app/src/pages/player/player_page.dart';
 import 'package:vibe_music_app/src/pages/favorites/favorites_page.dart';
+import 'package:vibe_music_app/src/pages/settings/settings_page.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
@@ -24,9 +25,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  /// 构建移动端布局
   Widget _buildMobileLayout(BuildContext context) {
-    // 检查是否为毛玻璃主题
     final themeController = Get.find<ThemeController>();
     final isGlassMorphism = themeController.isGlassMorphismTheme();
 
@@ -38,17 +37,15 @@ class HomeView extends GetView<HomeController> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF6366F1), // 靛蓝色
-                    Color(0xFF8B5CF6), // 紫色
-                    Color(0xFFEC4899), // 粉红色
+                    Color(0xFF6366F1),
+                    Color(0xFF8B5CF6),
+                    Color(0xFFEC4899),
                   ],
                 ),
               ),
               child: Stack(
                 children: [
-                  // 显示当前选中的页面
                   Obx(() => _getCurrentPage()),
-                  // 正在播放音乐的小悬浮组件（在播放页时隐藏）
                   Obx(() => controller.currentPage.value != 1
                       ? const Positioned(
                           bottom: 0,
@@ -62,9 +59,7 @@ class HomeView extends GetView<HomeController> {
             )
           : Stack(
               children: [
-                // 显示当前选中的页面
                 Obx(() => _getCurrentPage()),
-                // 正在播放音乐的小悬浮组件（在播放页时隐藏）
                 Obx(() => controller.currentPage.value != 1
                     ? const Positioned(
                         bottom: 0,
@@ -91,7 +86,9 @@ class HomeView extends GetView<HomeController> {
                 ],
               ),
               child: NavigationBar(
-                selectedIndex: controller.currentPage.value,
+                selectedIndex: controller.currentPage.value > 3
+                    ? 0
+                    : controller.currentPage.value,
                 onDestinationSelected: controller.changePage,
                 destinations: [
                   NavigationDestination(
@@ -115,9 +112,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  /// 构建平板端布局
   Widget _buildTabletLayout(BuildContext context) {
-    // 检查是否为毛玻璃主题
     final themeController = Get.find<ThemeController>();
     final isGlassMorphism = themeController.isGlassMorphismTheme();
 
@@ -130,15 +125,14 @@ class HomeView extends GetView<HomeController> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF6366F1), // 靛蓝色
-                    Color(0xFF8B5CF6), // 紫色
-                    Color(0xFFEC4899), // 粉红色
+                    Color(0xFF6366F1),
+                    Color(0xFF8B5CF6),
+                    Color(0xFFEC4899),
                   ],
                 ),
               ),
               child: Row(
                 children: [
-                  // 侧边栏导航
                   Container(
                     width: 200,
                     child: Obx(() => SidebarNavigation(
@@ -148,13 +142,10 @@ class HomeView extends GetView<HomeController> {
                               controller.changePage(_getMainPageIndex(index)),
                         )),
                   ),
-                  // 主内容区域
                   Expanded(
                     child: Stack(
                       children: [
-                        // 显示当前选中的页面
                         Obx(() => _getCurrentPage()),
-                        // 正在播放音乐的小悬浮组件（在播放页时隐藏）
                         Obx(() => controller.currentPage.value != 1
                             ? const Positioned(
                                 bottom: 0,
@@ -171,7 +162,6 @@ class HomeView extends GetView<HomeController> {
             )
           : Row(
               children: [
-                // 侧边栏导航
                 Container(
                   width: 200,
                   child: Obx(() => SidebarNavigation(
@@ -181,13 +171,10 @@ class HomeView extends GetView<HomeController> {
                             controller.changePage(_getMainPageIndex(index)),
                       )),
                 ),
-                // 主内容区域
                 Expanded(
                   child: Stack(
                     children: [
-                      // 显示当前选中的页面
                       Obx(() => _getCurrentPage()),
-                      // 正在播放音乐的小悬浮组件（在播放页时隐藏）
                       Obx(() => controller.currentPage.value != 1
                           ? const Positioned(
                               bottom: 0,
@@ -204,9 +191,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  /// 构建桌面端布局
   Widget _buildDesktopLayout(BuildContext context) {
-    // 检查是否为毛玻璃主题
     final themeController = Get.find<ThemeController>();
     final isGlassMorphism = themeController.isGlassMorphismTheme();
 
@@ -219,15 +204,14 @@ class HomeView extends GetView<HomeController> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF6366F1), // 靛蓝色
-                    Color(0xFF8B5CF6), // 紫色
-                    Color(0xFFEC4899), // 粉红色
+                    Color(0xFF6366F1),
+                    Color(0xFF8B5CF6),
+                    Color(0xFFEC4899),
                   ],
                 ),
               ),
               child: Row(
                 children: [
-                  // 自适应侧边栏宽度
                   AdaptiveSidebarWidth(
                     child: Obx(() => SidebarNavigation(
                           currentIndex:
@@ -236,11 +220,9 @@ class HomeView extends GetView<HomeController> {
                               controller.changePage(_getMainPageIndex(index)),
                         )),
                   ),
-                  // 主内容区域
                   Expanded(
                     child: Stack(
                       children: [
-                        // 顶部导航栏（仅在主页显示）
                         Obx(() => controller.currentPage.value == 0
                             ? Positioned(
                                 top: 0,
@@ -255,16 +237,10 @@ class HomeView extends GetView<HomeController> {
                                       onPressed: () =>
                                           Get.toNamed(AppRoutes.search),
                                     ),
-                                    IconButton(
-                                      icon: Icon(Icons.settings,
-                                          color: Colors.white),
-                                      onPressed: controller.navigateToSettings,
-                                    ),
                                   ],
                                 ),
                               )
                             : SizedBox.shrink()),
-                        // 显示当前选中的页面
                         Obx(() => Padding(
                               padding: EdgeInsets.only(
                                   top: controller.currentPage.value == 0
@@ -272,7 +248,6 @@ class HomeView extends GetView<HomeController> {
                                       : 0),
                               child: _getCurrentPage(),
                             )),
-                        // 正在播放音乐的小悬浮组件（在播放页时隐藏）
                         Obx(() => controller.currentPage.value != 1
                             ? const Positioned(
                                 bottom: 0,
@@ -289,7 +264,6 @@ class HomeView extends GetView<HomeController> {
             )
           : Row(
               children: [
-                // 自适应侧边栏宽度
                 AdaptiveSidebarWidth(
                   child: Obx(() => SidebarNavigation(
                         currentIndex:
@@ -298,11 +272,9 @@ class HomeView extends GetView<HomeController> {
                             controller.changePage(_getMainPageIndex(index)),
                       )),
                 ),
-                // 主内容区域
                 Expanded(
                   child: Stack(
                     children: [
-                      // 顶部导航栏（仅在主页显示）
                       Obx(() => controller.currentPage.value == 0
                           ? Positioned(
                               top: 0,
@@ -317,23 +289,16 @@ class HomeView extends GetView<HomeController> {
                                     onPressed: () =>
                                         Get.toNamed(AppRoutes.search),
                                   ),
-                                  IconButton(
-                                    icon: Icon(Icons.settings,
-                                        color: Colors.white),
-                                    onPressed: controller.navigateToSettings,
-                                  ),
                                 ],
                               ),
                             )
                           : SizedBox.shrink()),
-                      // 显示当前选中的页面
                       Obx(() => Padding(
                             padding: EdgeInsets.only(
                                 top:
                                     controller.currentPage.value == 0 ? 70 : 0),
                             child: _getCurrentPage(),
                           )),
-                      // 正在播放音乐的小悬浮组件（在播放页时隐藏）
                       Obx(() => controller.currentPage.value != 1
                           ? const Positioned(
                               bottom: 0,
@@ -350,7 +315,6 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  /// 获取当前页面
   Widget _getCurrentPage() {
     return IndexedStack(
       index: controller.currentPage.value,
@@ -359,44 +323,46 @@ class HomeView extends GetView<HomeController> {
         const PlayerPage(),
         const FavoritesPage(),
         const ProfilePage(),
+        const SettingsPage(),
       ],
     );
   }
 
-  /// 将主页面索引转换为侧边栏索引
   int _getSidebarIndex(int mainPageIndex) {
     switch (mainPageIndex) {
-      case 0: // 音乐库
+      case 0:
         return 0;
-      case 1: // 播放
-        return 1; // 播放页对应侧边栏的播放器项
-      case 2: // 我的收藏
+      case 1:
+        return 1;
+      case 2:
         return 2;
-      case 3: // 个人中心
+      case 3:
         return 3;
+      case 4:
+        return 4;
       default:
         return 0;
     }
   }
 
-  /// 将侧边栏索引转换为主页面索引
   int _getMainPageIndex(int sidebarIndex) {
     switch (sidebarIndex) {
-      case 0: // 音乐库
+      case 0:
         return 0;
-      case 1: // 播放器
+      case 1:
         return 1;
-      case 2: // 我的收藏
+      case 2:
         return 2;
-      case 3: // 个人中心
+      case 3:
         return 3;
+      case 4:
+        return 4;
       default:
         return 0;
     }
   }
 }
 
-/// 顶部导航栏组件
 class TopNavigationBar extends StatelessWidget {
   final Widget title;
   final List<Widget>? actions;

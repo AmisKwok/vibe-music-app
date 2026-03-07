@@ -36,7 +36,6 @@ class SidebarNavigation extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // Logo和标题
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20),
               child: Text(
@@ -48,8 +47,6 @@ class SidebarNavigation extends StatelessWidget {
                 ),
               ),
             ),
-
-            // 导航项
             ...[
               {'icon': Icons.music_note, 'label': localizations?.home ?? '音乐库'},
               {
@@ -61,6 +58,10 @@ class SidebarNavigation extends StatelessWidget {
                 'label': localizations?.favorites ?? '我的收藏'
               },
               {'icon': Icons.person, 'label': localizations?.my ?? '个人中心'},
+              {
+                'icon': Icons.settings,
+                'label': localizations?.settings ?? '设置'
+              },
             ].asMap().entries.map((entry) {
               int index = entry.key;
               Map<String, dynamic> item = entry.value;
@@ -73,10 +74,7 @@ class SidebarNavigation extends StatelessWidget {
                 onTap: () => onDestinationSelected(index),
               );
             }),
-
             const Spacer(),
-
-            // 用户信息
             Obx(() {
               final isAuthenticated =
                   authProvider.status == AuthStatus.authenticated;
