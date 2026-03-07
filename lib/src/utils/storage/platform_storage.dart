@@ -1,5 +1,4 @@
-import 'package:vibe_music_app/src/utils/app_logger.dart';
-import 'package:vibe_music_app/src/utils/sp_util.dart';
+import 'package:amis_flutter_utils/utils.dart';
 
 /// 平台存储适配器
 /// 为不同平台提供统一的存储接口

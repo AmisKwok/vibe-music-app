@@ -4,9 +4,8 @@ import 'package:get/get.dart';
 import 'package:vibe_music_app/src/services/api_service.dart';
 import 'package:vibe_music_app/src/services/global_notification_service.dart';
 import 'package:vibe_music_app/src/models/user_model.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
-import 'package:vibe_music_app/src/utils/sp_util.dart';
 import 'package:vibe_music_app/src/utils/deviceInfoUtils/device_info_manager.dart';
+import 'package:amis_flutter_utils/utils.dart';
 
 /// 认证状态枚举
 enum AuthStatus {

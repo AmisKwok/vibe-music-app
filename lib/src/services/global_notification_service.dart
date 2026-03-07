@@ -1,9 +1,9 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vibe_music_app/generated/app_localizations.dart';
 import 'package:vibe_music_app/src/controllers/auth_controller.dart';
 import 'package:vibe_music_app/src/routes/app_routes.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 
 /// 全局通知服务
 /// 提供全局的提示和对话框功能

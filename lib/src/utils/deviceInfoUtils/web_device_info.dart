@@ -1,5 +1,5 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 
 /// Web设备信息工具类
 ///

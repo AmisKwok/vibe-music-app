@@ -1,9 +1,8 @@
 import 'dart:async';
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 import 'package:vibe_music_app/src/utils/database/index.dart';
-import 'package:vibe_music_app/src/utils/sp_util.dart';
 import 'package:vibe_music_app/src/utils/di/dependency_injection.dart';
 
 /// 应用初始化器

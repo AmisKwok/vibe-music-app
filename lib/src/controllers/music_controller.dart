@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:vibe_music_app/src/services/api_service.dart';
 import 'package:vibe_music_app/src/models/song_model.dart';
 import 'package:vibe_music_app/src/models/enums.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 import 'package:vibe_music_app/src/services/audio_player_service.dart';
 import 'package:vibe_music_app/src/services/playlist_manager.dart';
 import 'package:vibe_music_app/src/services/favorite_service.dart';

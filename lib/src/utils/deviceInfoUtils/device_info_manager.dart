@@ -1,5 +1,5 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 import 'package:vibe_music_app/src/utils/deviceInfoUtils/android_device_info.dart';
 import 'package:vibe_music_app/src/utils/deviceInfoUtils/ios_device_info.dart';
 import 'package:vibe_music_app/src/utils/deviceInfoUtils/web_device_info.dart';

@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:vibe_music_app/src/models/song_model.dart';
 import 'package:vibe_music_app/src/services/api_service.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 
 /// 收藏服务
 /// 负责处理歌曲收藏的所有操作，包括添加、移除、加载和缓存

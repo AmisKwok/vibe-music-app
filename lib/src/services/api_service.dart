@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart' as getx;
-import 'package:vibe_music_app/src/utils/app_logger.dart';
-import 'package:vibe_music_app/src/utils/sp_util.dart';
-import 'package:vibe_music_app/src/utils/encryption_util.dart';
 import 'global_notification_service.dart';
 
 /// API服务类

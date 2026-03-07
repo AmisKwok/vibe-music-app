@@ -1,10 +1,10 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:vibe_music_app/generated/app_localizations.dart';
 import 'package:vibe_music_app/src/controllers/music_controller.dart';
 import 'package:vibe_music_app/src/controllers/auth_controller.dart';
 import 'package:vibe_music_app/src/models/song_model.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 import 'package:vibe_music_app/src/pages/home/widgets/controller.dart';
 
 class SearchPageController extends GetxController {

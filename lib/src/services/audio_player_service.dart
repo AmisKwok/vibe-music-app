@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_session/audio_session.dart';
@@ -7,8 +8,6 @@ import 'package:audio_session/audio_session.dart';
 import 'package:audioplayers/audioplayers.dart' as audioplayers;
 import 'package:vibe_music_app/src/models/song_model.dart';
 import 'package:vibe_music_app/src/models/enums.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
-import 'package:vibe_music_app/src/utils/sp_util.dart';
 
 /// 音频播放器服务
 /// 负责处理音频播放相关的所有功能

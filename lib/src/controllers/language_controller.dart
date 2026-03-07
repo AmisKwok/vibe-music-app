@@ -1,7 +1,6 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
-import '../utils/sp_util.dart';
 
 /// 语言控制器 - 使用GetX实现
 /// 管理应用语言设置和系统语言变化监听

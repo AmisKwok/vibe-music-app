@@ -1,6 +1,6 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:vibe_music_app/src/utils/sp_util.dart';
 
 /// 主题类型枚举
 enum ThemeType {

@@ -1,3 +1,4 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -12,7 +13,6 @@ import 'package:vibe_music_app/src/utils/snackbar_manager.dart';
 import 'package:vibe_music_app/src/routes/app_routes.dart';
 import 'package:vibe_music_app/src/utils/glass_morphism/responsive_layout.dart';
 import 'package:vibe_music_app/src/pages/home/widgets/controller.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 
 /// 歌曲列表页面
 class SongListPage extends StatefulWidget {

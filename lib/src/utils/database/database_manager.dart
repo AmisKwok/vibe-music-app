@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:vibe_music_app/src/data/database/app_database.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 import 'package:vibe_music_app/src/utils/storage/platform_storage.dart';
 
 /// 数据库管理器

@@ -1,7 +1,7 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:vibe_music_app/src/config/app_config.dart';
 import 'package:vibe_music_app/src/utils/app_initializer.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
 
 Future<void> main() async {
   // 先初始化日志工具

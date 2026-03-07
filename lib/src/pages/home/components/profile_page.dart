@@ -1,3 +1,4 @@
+import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -6,8 +7,6 @@ import 'package:vibe_music_app/generated/app_localizations.dart';
 import 'package:vibe_music_app/src/controllers/auth_controller.dart';
 
 import 'package:vibe_music_app/src/routes/app_routes.dart';
-import 'package:vibe_music_app/src/utils/app_logger.dart';
-import 'package:vibe_music_app/src/utils/sp_util.dart';
 
 /// 个人中心页面
 class ProfilePage extends StatefulWidget {
