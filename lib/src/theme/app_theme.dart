@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 /// 定义了应用的明/暗两种主题样式
 class AppTheme {
   /// Musike 主题配色常量
-  static const Color musikeBackground = Color(0xFFF5F5F5);
-  static const Color musikeCardBackground = Color(0xFFFAFAFA);
+  static const Color musikeBackground = Color(0xFFFBF7F0);
+  static const Color musikeCardBackground = Color(0xFFFCF9F3);
   static const Color musikeTextPrimary = Color(0xFF1F2937);
   static const Color musikeTextSecondary = Color(0xFF6B7280);
   static const Color musikeAccent = Color(0xFF6366F1);

@@ -7,9 +7,9 @@ import 'package:vibe_music_app/src/pages/player/components/player_cover_art.dart
 import 'package:vibe_music_app/src/pages/player/components/player_song_info.dart';
 import 'package:vibe_music_app/src/pages/player/components/player_progress_bar.dart';
 import 'package:vibe_music_app/src/pages/player/components/player_controls.dart';
-import 'package:vibe_music_app/src/pages/player/components/player_volume_controls.dart';
 import 'package:vibe_music_app/src/pages/player/components/player_playlist.dart';
 import 'package:vibe_music_app/src/utils/glass_morphism/responsive_layout.dart';
+import 'package:vibe_music_app/src/theme/app_theme.dart';
 import 'dart:ui';
 
 class PlayerView extends GetView<PlayerController> {
@@ -44,7 +44,7 @@ class PlayerView extends GetView<PlayerController> {
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return Container(
-                    color: const Color(0xFFF5F5F5),
+                    color: AppTheme.musikeBackground,
                     child: Center(
                       child: CircularProgressIndicator(
                         color: const Color(0xFF6366F1),
@@ -209,6 +209,7 @@ class PlayerView extends GetView<PlayerController> {
     final mainContent = Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)?.nowPlaying ?? '正在播放'),
+        automaticallyImplyLeading: false,
         actions: [
           Obx(() {
             final currentSong = controller.currentSong;

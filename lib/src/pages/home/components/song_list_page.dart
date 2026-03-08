@@ -158,7 +158,12 @@ class _SongListPageState extends State<SongListPage>
         slivers: [
           // 顶部搜索栏
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top + 16,
+              left: 16,
+              right: 16,
+              bottom: 16,
+            ),
             sliver: SliverToBoxAdapter(
               child: isDesktop ? _buildDesktopHeader() : _buildMobileHeader(),
             ),

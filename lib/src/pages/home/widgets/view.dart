@@ -8,6 +8,7 @@ import 'package:vibe_music_app/src/utils/glass_morphism/responsive_layout.dart';
 import 'package:vibe_music_app/src/utils/glass_morphism/sidebar_navigation.dart';
 import 'package:vibe_music_app/src/pages/home/components/song_list_page.dart';
 import 'package:vibe_music_app/src/pages/home/components/profile_page.dart';
+import 'package:vibe_music_app/src/theme/app_theme.dart';
 import 'package:vibe_music_app/src/pages/home/components/currently_playing_bar.dart';
 import 'package:vibe_music_app/src/pages/player/player_page.dart';
 import 'package:vibe_music_app/src/pages/favorites/favorites_page.dart';
@@ -107,8 +108,8 @@ class HomeView extends GetView<HomeController> {
                     onDestinationSelected: controller.changePage,
                     destinations: [
                       NavigationDestination(
-                          icon: Icon(Icons.music_note),
-                          label: AppLocalizations.of(context)?.songs ?? '歌曲'),
+                          icon: Icon(Icons.home),
+                          label: AppLocalizations.of(context)?.home ?? '主页'),
                       NavigationDestination(
                           icon: Icon(Icons.play_circle),
                           label: AppLocalizations.of(context)?.player ?? '播放'),
@@ -137,7 +138,7 @@ class HomeView extends GetView<HomeController> {
 
     return Scaffold(
       backgroundColor: isMusikeTheme
-          ? const Color(0xFFF5F5F5)
+          ? AppTheme.musikeBackground
           : Theme.of(context).colorScheme.background,
       body: isGlassMorphism
           ? Container(
@@ -220,7 +221,7 @@ class HomeView extends GetView<HomeController> {
 
     return Scaffold(
       backgroundColor: isMusikeTheme
-          ? const Color(0xFFF5F5F5)
+          ? AppTheme.musikeBackground
           : Theme.of(context).colorScheme.background,
       body: isGlassMorphism
           ? Container(

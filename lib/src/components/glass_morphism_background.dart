@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:vibe_music_app/src/controllers/theme_controller.dart';
+import 'package:vibe_music_app/src/theme/app_theme.dart';
 
 /// 毛玻璃背景组件
 /// 用于在毛玻璃主题时显示渐变背景
@@ -35,7 +36,7 @@ class GlassMorphismBackground extends StatelessWidget {
 
     if (isMusikeTheme) {
       return Container(
-        color: const Color(0xFFF5F5F5),
+        color: AppTheme.musikeBackground,
         child: child,
       );
     }
