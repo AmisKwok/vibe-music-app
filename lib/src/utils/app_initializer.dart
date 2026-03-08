@@ -35,6 +35,9 @@ class AppInitializer {
       // 请求通知权限（Android 13+）
       await _requestNotificationPermission();
 
+      // 初始化 just_audio_background
+      await initializeJustAudioBackground();
+
       // 启动时间统计
       stopwatch.stop();
       AppLogger().d('🚀 应用初始化完成，耗时: ${stopwatch.elapsedMilliseconds}ms');

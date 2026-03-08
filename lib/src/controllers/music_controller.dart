@@ -67,11 +67,22 @@ class MusicController extends GetxController {
       // 恢复播放状态
       await _restorePlayState();
 
-      // 添加播放器状态监听，处理自动播放下一首
+      // 添加播放器状态监听
+      // 注意：使用 ConcatenatingAudioSource 后，just_audio 会自动处理播放列表切换
+      // 只有在播放列表真正结束时才需要处理
       _audioPlayerService.playerStateStream.listen((state) {
         if (state == AppPlayerState.completed) {
-          // 当歌曲播放完成时，自动播放下一首
-          _playNextSongAutomatically();
+          // 播放列表结束，可以在这里做一些处理（如停止播放等）
+          AppLogger().d('🎵 播放列表已结束');
+        }
+      });
+
+      // 监听播放索引变化，更新 UI
+      _audioPlayerService.currentIndexStream.listen((index) {
+        if (index >= 0 && index < _playlistManager.playlist.length) {
+          _playlistManager.currentIndex = index;
+          AppLogger().d('🎵 播放索引变化，更新 UI: $index');
+          update();
         }
       });
 
@@ -118,20 +129,35 @@ class MusicController extends GetxController {
     try {
       AppLogger().d('🎵 开始播放歌曲: ${song.songName}');
 
+      List<Song> currentPlaylist;
+      int startIndex;
+
       // 如果提供了新的播放列表
       if (playlist != null) {
         await _playlistManager.updatePlaylist(playlist);
         await _playlistManager.setCurrentSong(song);
+        currentPlaylist = playlist;
+        startIndex = _playlistManager.currentIndex;
       } else if (_playlistManager.playlist.isNotEmpty) {
         // 如果没有提供新的播放列表，就在当前播放列表中查找选中的歌曲
         await _playlistManager.setCurrentSong(song);
+        currentPlaylist = _playlistManager.playlist;
+        startIndex = _playlistManager.currentIndex;
+      } else {
+        // 没有播放列表，只播放单首歌曲
+        await _audioPlayerService.playSong(song);
+        await _playlistManager.savePlayHistory(song);
+        update();
+        AppLogger().d('✅ 歌曲播放成功（单首）: ${song.songName}');
+        return;
       }
 
       // 立即更新UI，确保显示正确的歌曲信息
       update();
 
-      // 播放歌曲
-      await _audioPlayerService.playSong(song);
+      // 使用播放列表播放，这样 just_audio 可以自动处理下一首
+      await _audioPlayerService.setPlaylist(currentPlaylist,
+          startIndex: startIndex);
 
       // 保存播放历史
       await _playlistManager.savePlayHistory(song);
@@ -221,26 +247,6 @@ class MusicController extends GetxController {
       }
     } catch (e) {
       AppLogger().e('播放上一首歌曲失败: $e');
-    }
-  }
-
-  /// 自动播放下一首歌曲
-  /// 当歌曲播放完成时调用
-  Future<void> _playNextSongAutomatically() async {
-    try {
-      // 获取当前重复模式
-      final repeatMode = _playlistManager.repeatMode;
-
-      // 如果是单曲循环，不做处理（AudioPlayerService已经处理）
-      if (repeatMode == RepeatMode.one) {
-        return;
-      }
-
-      // 播放下一首歌曲
-      await next();
-      AppLogger().d('🎵 自动播放下一首歌曲');
-    } catch (e) {
-      AppLogger().e('自动播放下一首歌曲失败: $e');
     }
   }
 

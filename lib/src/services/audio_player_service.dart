@@ -52,6 +52,7 @@ class AudioPlayerService {
   final _playerStateStreamController =
       StreamController<AppPlayerState>.broadcast();
   final _volumeStreamController = StreamController<double>.broadcast();
+  final _currentIndexStreamController = StreamController<int>.broadcast();
 
   /// 单例实例
   static final AudioPlayerService _instance = AudioPlayerService._internal();
@@ -68,6 +69,7 @@ class AudioPlayerService {
   Stream<AppPlayerState> get playerStateStream =>
       _playerStateStreamController.stream;
   Stream<double> get volumeStream => _volumeStreamController.stream;
+  Stream<int> get currentIndexStream => _currentIndexStreamController.stream;
 
   /// 获取器
   AppPlayerState get playerState => _playerState;
@@ -144,9 +146,6 @@ class AudioPlayerService {
           case audioplayers.PlayerState.paused:
             newState = AppPlayerState.paused;
             break;
-          case audioplayers.PlayerState.completed:
-            _onSongComplete();
-            return;
           default:
             newState = AppPlayerState.loading;
             break;
@@ -206,6 +205,8 @@ class AudioPlayerService {
 
     // 监听播放器状态变化
     _audioPlayer!.playerStateStream.listen((state) {
+      AppLogger().d(
+          '播放器状态变化: processingState=${state.processingState}, playing=${state.playing}');
       AppPlayerState newState;
       switch (state.processingState) {
         case ProcessingState.idle:
@@ -220,7 +221,14 @@ class AudioPlayerService {
               state.playing ? AppPlayerState.playing : AppPlayerState.paused;
           break;
         case ProcessingState.completed:
-          _onSongComplete();
+          AppLogger().d('歌曲播放完成，hasNext=${_audioPlayer!.hasNext}');
+          // 不在这里处理，让 just_audio 自然处理播放列表切换
+          // 只有在播放列表真正结束时才设置状态
+          if (_playlist.isEmpty || !_audioPlayer!.hasNext) {
+            AppLogger().d('播放列表已结束');
+            _playerState = AppPlayerState.completed;
+            _playerStateStreamController.add(_playerState);
+          }
           return;
       }
 
@@ -230,23 +238,20 @@ class AudioPlayerService {
       }
     });
 
-    // 设置默认循环模式
-    _audioPlayer!.setLoopMode(LoopMode.off);
+    // 监听当前播放索引变化（自动播放下一首时触发）
+    _audioPlayer!.currentIndexStream.listen((index) {
+      if (index != null && index != _currentIndex) {
+        _currentIndex = index;
+        AppLogger().d('当前播放索引变化: $index');
+        if (_playlist.isNotEmpty && index < _playlist.length) {
+          AppLogger().d('正在播放: ${_playlist[index].songName}');
+        }
+        // 通知索引变化，让 MusicController 更新 UI
+        _currentIndexStreamController.add(index);
+      }
+    });
 
     AppLogger().d('✅ just_audio_background 已在 main.dart 中初始化');
-  }
-
-  /// 歌曲播放完成时的处理
-  void _onSongComplete() {
-    if (_repeatMode == RepeatMode.one) {
-      // 单曲循环
-      seekTo(Duration.zero);
-      play();
-    } else {
-      // 播放完成
-      _playerState = AppPlayerState.completed;
-      _playerStateStreamController.add(_playerState);
-    }
   }
 
   /// 播放指定歌曲
@@ -271,8 +276,33 @@ class AudioPlayerService {
     try {
       if (!isDesktop) {
         // 非桌面端平台，使用 just_audio 播放器
-        // 创建只有这首歌的播放列表，以支持通知栏的上一首/下一首按钮
-        await setPlaylist([song], startIndex: 0);
+        if (_audioPlayer == null) {
+          throw Exception('音频播放器未初始化');
+        }
+
+        // 重置播放器
+        await _audioPlayer!.stop();
+
+        // 设置单个音频源（带元数据）
+        AppLogger().d('使用 just_audio 准备从URL播放音频');
+        await _audioPlayer!.setAudioSource(
+          AudioSource.uri(
+            Uri.parse(song.songUrl!),
+            tag: MediaItem(
+              id: song.id?.toString() ?? song.songUrl!,
+              album: song.albumName,
+              title: song.songName ?? '未知歌曲',
+              artist: song.artistName ?? '未知艺术家',
+              artUri: song.coverUrl != null ? Uri.parse(song.coverUrl!) : null,
+            ),
+          ),
+        );
+
+        // 播放歌曲
+        await _audioPlayer!.play();
+        _playerState = AppPlayerState.playing;
+        _playerStateStreamController.add(_playerState);
+        AppLogger().d('使用 just_audio 成功开始播放歌曲: ${song.songName}');
       } else {
         // 桌面端平台，使用 audioplayers 播放器
         await _playSongWithAudioPlayers(song);
@@ -557,8 +587,14 @@ class AudioPlayerService {
       useLazyPreparation: true,
     );
 
+    AppLogger().d('播放列表大小: ${_playlist.length}, 起始索引: $startIndex');
+
     // 重置播放器
     await _audioPlayer!.stop();
+
+    // 设置循环模式为全部循环，这样播放完一首后会自动播放下一首
+    await _audioPlayer!.setLoopMode(LoopMode.all);
+    AppLogger().d('已设置循环模式为: all');
 
     // 设置音频源并从指定索引开始播放
     AppLogger().d('设置播放列表，从索引 $startIndex 开始播放');
@@ -567,6 +603,9 @@ class AudioPlayerService {
       initialIndex: startIndex,
       initialPosition: Duration.zero,
     );
+
+    AppLogger().d(
+        '音频源设置完成，当前索引: ${_audioPlayer!.currentIndex}, hasNext: ${_audioPlayer!.hasNext}');
 
     // 播放歌曲
     await _audioPlayer!.play();
@@ -631,5 +670,6 @@ class AudioPlayerService {
     _durationStreamController.close();
     _playerStateStreamController.close();
     _volumeStreamController.close();
+    _currentIndexStreamController.close();
   }
 }

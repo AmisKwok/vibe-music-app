@@ -15,9 +15,4 @@ Future<void> main() async {
 
   // 运行应用
   runApp(AppConfig.buildApp());
-
-  // 应用启动后异步初始化 just_audio_background
-  Future.delayed(Duration.zero, () async {
-    await AppInitializer.initializeJustAudioBackground();
-  });
 }
