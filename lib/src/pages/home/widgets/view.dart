@@ -75,12 +75,14 @@ class HomeView extends GetView<HomeController> {
             ),
       bottomNavigationBar: SafeArea(
         child: Obx(() => ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                 child: Container(
                   decoration: BoxDecoration(
                     color: isMusikeTheme
-                        ? Colors.white.withValues(alpha: 0.8)
+                        ? AppTheme.musikeBackground
                         : Theme.of(context).colorScheme.surface,
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(24)),

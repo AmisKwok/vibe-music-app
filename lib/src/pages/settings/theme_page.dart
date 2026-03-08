@@ -70,14 +70,14 @@ class ThemePage extends StatelessWidget {
                       ),
                       Divider(),
                       RadioListTile<ThemeType>(
-                        value: ThemeType.glassMorphism,
+                        value: ThemeType.musike,
                         groupValue: themeController.themeType.value,
                         onChanged: (value) {
                           if (value != null) {
                             themeController.changeTheme(value);
                           }
                         },
-                        title: Text(localizations.glassMorphismMode),
+                        title: Text('Musike'),
                         activeColor: Colors.blue,
                       ),
                     ],

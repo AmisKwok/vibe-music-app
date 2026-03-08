@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// 应用主题配置类
 /// 定义了应用的明/暗两种主题样式
 class AppTheme {
   /// Musike 主题配色常量
-  static const Color musikeBackground = Color(0xFFFBF7F0);
+  static const Color musikeBackground = Color.fromARGB(255, 238, 232, 222);
   static const Color musikeCardBackground = Color(0xFFFCF9F3);
   static const Color musikeTextPrimary = Color(0xFF1F2937);
   static const Color musikeTextSecondary = Color(0xFF6B7280);
@@ -295,6 +296,7 @@ class AppTheme {
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
       titleTextStyle: TextStyle(
         color: musikeTextPrimary,
         fontSize: 18,
