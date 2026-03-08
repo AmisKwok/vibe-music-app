@@ -9,6 +9,7 @@ import 'package:vibe_music_app/src/pages/player/components/player_progress_bar.d
 import 'package:vibe_music_app/src/pages/player/components/player_controls.dart';
 import 'package:vibe_music_app/src/pages/player/components/player_playlist.dart';
 import 'package:vibe_music_app/src/utils/glass_morphism/responsive_layout.dart';
+import 'package:vibe_music_app/src/utils/extensions/color_extension.dart';
 import 'package:vibe_music_app/src/theme/app_theme.dart';
 import 'dart:ui';
 
@@ -59,8 +60,8 @@ class PlayerView extends GetView<PlayerController> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          const Color(0xFF6366F1).withValues(alpha: 0.3),
-                          const Color(0xFF818CF8).withValues(alpha: 0.3),
+                          const Color(0xFF6366F1).withAlpha(76),
+                          const Color(0xFF818CF8).withAlpha(76),
                         ],
                       ),
                     ),
@@ -74,8 +75,8 @@ class PlayerView extends GetView<PlayerController> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    const Color(0xFF6366F1).withValues(alpha: 0.3),
-                    const Color(0xFF818CF8).withValues(alpha: 0.3),
+                    const Color(0xFF6366F1).withAlpha(76),
+                    const Color(0xFF818CF8).withAlpha(76),
                   ],
                 ),
               ),
@@ -86,7 +87,7 @@ class PlayerView extends GetView<PlayerController> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
             child: Container(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: Colors.white.withAlpha(76),
             ),
           ),
         ),
@@ -194,6 +195,29 @@ class PlayerView extends GetView<PlayerController> {
                   ),
                 ],
               ),
+              Obx(() =>
+                  controller.isExpanded.value && controller.playlist.isNotEmpty
+                      ? Positioned.fill(
+                          child: GestureDetector(
+                            onTap: controller.togglePlaylistExpanded,
+                            child: Container(
+                              color: Colors.transparent,
+                            ),
+                          ),
+                        )
+                      : const SizedBox()),
+              Obx(() => controller.isExpanded.value &&
+                      controller.playlist.isNotEmpty
+                  ? PlayerPlaylist(
+                      playlist: controller.playlist,
+                      currentIndex: controller.currentIndex,
+                      onSongTap: controller.playSongAtIndex,
+                      onToggleFavorite: controller.handlePlaylistFavoriteToggle,
+                      isSongFavorited: controller.isSongFavorited,
+                      onRemoveSong: controller.removeFromPlaylist,
+                      onClearPlaylist: controller.clearPlaylist,
+                    )
+                  : const SizedBox()),
             ],
           ),
         ),
@@ -303,6 +327,29 @@ class PlayerView extends GetView<PlayerController> {
               ),
             ),
           ),
+          Obx(() =>
+              controller.isExpanded.value && controller.playlist.isNotEmpty
+                  ? Positioned.fill(
+                      child: GestureDetector(
+                        onTap: controller.togglePlaylistExpanded,
+                        child: Container(
+                          color: Colors.transparent,
+                        ),
+                      ),
+                    )
+                  : const SizedBox()),
+          Obx(() =>
+              controller.isExpanded.value && controller.playlist.isNotEmpty
+                  ? PlayerPlaylist(
+                      playlist: controller.playlist,
+                      currentIndex: controller.currentIndex,
+                      onSongTap: controller.playSongAtIndex,
+                      onToggleFavorite: controller.handlePlaylistFavoriteToggle,
+                      isSongFavorited: controller.isSongFavorited,
+                      onRemoveSong: controller.removeFromPlaylist,
+                      onClearPlaylist: controller.clearPlaylist,
+                    )
+                  : const SizedBox()),
         ],
       ),
     );

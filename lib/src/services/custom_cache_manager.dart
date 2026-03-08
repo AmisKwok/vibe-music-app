@@ -6,14 +6,46 @@ import 'package:amis_flutter_utils/utils.dart';
 
 class CustomCacheManager {
   static const String key = 'libCachedImageData';
+  
+  // 自定义缓存管理器实例
+  static CacheManager? _instance;
 
   static Future<void> initialize() async {
     try {
-      await _ensureCacheDatabaseValid();
+      // 确保缓存目录存在
+      final dir = await getApplicationCacheDirectory();
+      final cacheDir = Directory(p.join(dir.path, key));
+      if (!await cacheDir.exists()) {
+        await cacheDir.create(recursive: true);
+        AppLogger().d('图片缓存目录创建成功');
+      }
+      
+      // 初始化自定义缓存管理器
+      _instance = CacheManager(
+        Config(
+          key,
+          stalePeriod: const Duration(days: 7),
+          maxNrOfCacheObjects: 200,
+          fileService: HttpFileService(),
+        ),
+      );
+      
       AppLogger().d('图片缓存管理器初始化成功');
     } catch (e) {
       AppLogger().e('图片缓存管理器初始化失败: $e');
     }
+  }
+
+  /// 获取缓存管理器实例
+  static CacheManager get instance {
+    _instance ??= CacheManager(
+      Config(
+        key,
+        stalePeriod: const Duration(days: 7),
+        maxNrOfCacheObjects: 200,
+      ),
+    );
+    return _instance!;
   }
 
   static Future<void> _ensureCacheDatabaseValid() async {

@@ -15,11 +15,11 @@ class DependencyInjection {
     Get.put(AuthController(), permanent: true);
     Get.put(MusicController(), permanent: true);
 
-    // 页面控制器（延迟初始化）
-    Get.lazyPut(() => HomeController(), fenix: true);
-    Get.lazyPut(() => PlayerController(), fenix: true);
-    Get.lazyPut(() => FavoritesController(), fenix: true);
-    Get.lazyPut(() => SearchPageController(), fenix: true);
+    // 页面控制器（立即初始化，避免Release模式下混淆导致的问题）
+    Get.put(HomeController(), permanent: true);
+    Get.put(PlayerController(), permanent: true);
+    Get.put(FavoritesController(), permanent: true);
+    Get.put(SearchPageController(), permanent: true);
     // 认证页面控制器不在这里注册，而是在页面中使用Get.create
 
     // 可以在这里添加更多的依赖注入

@@ -9,7 +9,7 @@ class SearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<SearchPageController>(
-      init: Get.find<SearchPageController>(),
+      init: SearchPageController(),
       builder: (controller) {
         return SearchView();
       },

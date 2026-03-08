@@ -9,7 +9,7 @@ class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<FavoritesController>(
-      init: Get.find<FavoritesController>(),
+      init: FavoritesController(),
       builder: (controller) {
         return const FavoritesView();
       },

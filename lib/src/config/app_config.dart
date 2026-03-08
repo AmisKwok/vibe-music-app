@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:vibe_music_app/generated/app_localizations.dart';
 import 'package:vibe_music_app/src/controllers/language_controller.dart';
@@ -96,8 +97,22 @@ class AppConfig {
 }
 
 /// Vibe Music 应用主组件
-class VibeMusicApp extends StatelessWidget {
+class VibeMusicApp extends StatefulWidget {
   const VibeMusicApp({super.key});
+
+  @override
+  State<VibeMusicApp> createState() => _VibeMusicAppState();
+}
+
+class _VibeMusicAppState extends State<VibeMusicApp> {
+  @override
+  void initState() {
+    super.initState();
+    // 在首帧渲染完成后移除启动页
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FlutterNativeSplash.remove();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

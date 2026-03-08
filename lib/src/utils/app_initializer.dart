@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:vibe_music_app/src/services/custom_cache_manager.dart';
 import 'package:vibe_music_app/src/utils/database/index.dart';
 import 'package:vibe_music_app/src/utils/di/dependency_injection.dart';
@@ -60,6 +61,9 @@ class AppInitializer {
     try {
       // 初始化图片缓存管理器
       await CustomCacheManager.initialize();
+
+      // 预初始化默认缓存管理器的数据库（避免第一次使用时卡顿）
+      await _warmUpImageCache();
     } catch (e) {
       AppLogger().e('图片缓存管理器初始化失败: $e');
     }
@@ -71,5 +75,21 @@ class AppInitializer {
   /// 初始化依赖注入
   static Future<void> _initializeDependencyInjection() async {
     DependencyInjection.init();
+  }
+
+  /// 预热图片缓存系统
+  /// 通过访问缓存数据库来触发初始化，避免第一次使用时卡顿
+  static Future<void> _warmUpImageCache() async {
+    try {
+      // 触发默认缓存管理器的初始化
+      final cacheManager = DefaultCacheManager();
+
+      // 尝试获取缓存信息来触发数据库初始化
+      final fileInfo = await cacheManager.getFileFromCache('warmup');
+      AppLogger().d('图片缓存系统预热完成');
+    } catch (e) {
+      // 预热失败不影响应用启动
+      AppLogger().d('图片缓存系统预热跳过: $e');
+    }
   }
 }

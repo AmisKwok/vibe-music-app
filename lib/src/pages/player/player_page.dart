@@ -9,7 +9,7 @@ class PlayerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<PlayerController>(
-      init: Get.find<PlayerController>(),
+      init: PlayerController(),
       builder: (controller) {
         return const PlayerView();
       },

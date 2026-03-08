@@ -12,6 +12,20 @@ class FavoritesView extends GetView<FavoritesController> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)?.favorites ?? '我的收藏'),
+        actions: [
+          // 播放全部按钮
+          Obx(() {
+            if (!controller.isAuthenticated.value ||
+                controller.allSongs.isEmpty) {
+              return const SizedBox();
+            }
+            return IconButton(
+              icon: const Icon(Icons.playlist_play),
+              tooltip: '播放全部',
+              onPressed: () => controller.playAllFavorites(),
+            );
+          }),
+        ],
       ),
       body: Center(
         child: Obx(() {
@@ -76,6 +90,35 @@ class FavoritesView extends GetView<FavoritesController> {
                     IconButton(
                       icon: Icon(Icons.play_arrow),
                       onPressed: () => controller.handleSongTap(index),
+                    ),
+                    // 更多按钮
+                    IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      onPressed: () {
+                        // 显示更多选项菜单
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return Container(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: const Icon(Icons.queue_play_next),
+                                    title: Text('下一首播放'),
+                                    onTap: () {
+                                      // 添加到下一首播放
+                                      controller.insertNextToPlay(index);
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
                   ],
                 ),

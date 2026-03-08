@@ -160,14 +160,26 @@ class FavoritesController extends GetxController {
   /// 处理歌曲点击
   Future<void> handleSongTap(int index) async {
     final song = allSongs[index];
-    // 将收藏歌曲添加到播放列表
+
+    // 构建新的播放列表（包含所有收藏歌曲）
+    final newPlaylist = <Song>[];
     for (final s in allSongs) {
+      // 检查是否已在播放列表中
       if (!_musicController.playlist.any((item) => item.songUrl == s.songUrl)) {
-        await _musicController.addToPlaylist(s);
+        newPlaylist.add(s);
+      } else {
+        // 如果已在播放列表中，使用现有实例
+        final existingSong = _musicController.playlist.firstWhere(
+          (item) => item.songUrl == s.songUrl,
+          orElse: () => s,
+        );
+        newPlaylist.add(existingSong);
       }
     }
-    // 播放选中的歌曲
-    await _musicController.playSong(song);
+
+    // 使用新的播放列表播放选中的歌曲
+    await _musicController.playSong(song, playlist: newPlaylist);
+
     // 导航到播放器页面（切换到底部导航栏的播放页）
     try {
       final homeController = Get.find<HomeController>();
@@ -186,5 +198,61 @@ class FavoritesController extends GetxController {
   /// 检查是否已登录（兼容旧代码）
   bool get isAuthenticatedValue {
     return isAuthenticated.value;
+  }
+
+  /// 播放全部收藏歌曲
+  Future<void> playAllFavorites() async {
+    if (allSongs.isEmpty) return;
+
+    // 构建新的播放列表（包含所有收藏歌曲）
+    final newPlaylist = <Song>[];
+    for (final s in allSongs) {
+      // 检查是否已在播放列表中
+      if (!_musicController.playlist.any((item) => item.songUrl == s.songUrl)) {
+        newPlaylist.add(s);
+      } else {
+        // 如果已在播放列表中，使用现有实例
+        final existingSong = _musicController.playlist.firstWhere(
+          (item) => item.songUrl == s.songUrl,
+          orElse: () => s,
+        );
+        newPlaylist.add(existingSong);
+      }
+    }
+
+    // 使用新的播放列表播放第一首歌曲
+    final firstSong = allSongs.first;
+    await _musicController.playSong(firstSong, playlist: newPlaylist);
+
+    // 导航到播放器页面（切换到底部导航栏的播放页）
+    try {
+      final homeController = Get.find<HomeController>();
+      homeController.changePage(1);
+    } catch (e) {
+      // 如果找不到HomeController，再使用命名路由
+      Get.toNamed(AppRoutes.player);
+    }
+  }
+
+  /// 将歌曲添加到下一首播放
+  Future<void> insertNextToPlay(int index) async {
+    final song = allSongs[index];
+
+    // 先将整个收藏列表添加到播放列表（避免重复）
+    for (final s in allSongs) {
+      if (!_musicController.playlist.any((item) => item.songUrl == s.songUrl)) {
+        await _musicController.addToPlaylist(s);
+      }
+    }
+
+    // 将选中的歌曲插入到下一首播放
+    _musicController.insertNextToPlay(song);
+
+    SnackbarManager().showSnackbar(
+      title: '成功',
+      message: '已添加到下一首播放',
+      icon: const Icon(Icons.check_circle, color: Colors.white),
+      duration: const Duration(seconds: 2),
+    );
   }
 }
