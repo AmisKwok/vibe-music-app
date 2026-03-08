@@ -447,7 +447,6 @@ class ImageLoader {
       fit: fit,
       width: width,
       height: height,
-      // 使用统一的占位符，让CachedNetworkImage自己处理加载状态
       placeholder: placeholder ??
           (context, url) => Container(
                 width: width,

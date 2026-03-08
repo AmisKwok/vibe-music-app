@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:vibe_music_app/src/services/custom_cache_manager.dart';
 import 'package:vibe_music_app/src/utils/database/index.dart';
 import 'package:vibe_music_app/src/utils/di/dependency_injection.dart';
 
@@ -54,6 +55,13 @@ class AppInitializer {
       await DatabaseManager().initDatabase();
     } catch (e) {
       AppLogger().e('数据库初始化失败: $e');
+    }
+
+    try {
+      // 初始化图片缓存管理器
+      await CustomCacheManager.initialize();
+    } catch (e) {
+      AppLogger().e('图片缓存管理器初始化失败: $e');
     }
 
     // 工具类初始化完成

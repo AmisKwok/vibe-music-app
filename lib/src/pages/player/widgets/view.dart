@@ -99,10 +99,6 @@ class PlayerView extends GetView<PlayerController> {
               AppLocalizations.of(context)?.nowPlaying ?? '正在播放',
               style: TextStyle(color: textColor, fontWeight: FontWeight.w500),
             ),
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: textColor),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
             actions: [
               Obx(() {
                 final currentSong = controller.currentSong;

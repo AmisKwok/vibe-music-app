@@ -8,9 +8,9 @@ class PlayerCoverArt extends StatelessWidget {
   final String? coverUrl;
 
   const PlayerCoverArt({
-    Key? key,
+    super.key,
     required this.coverUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class PlayerCoverArt extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(76), // 使用withAlpha替代withValues
+            color: Colors.black.withAlpha(76),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
