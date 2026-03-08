@@ -2,12 +2,13 @@ import 'dart:async';
 import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:audio_session/audio_session.dart';
-
-// 导入 audioplayers 库，并添加前缀以避免命名冲突
-import 'package:audioplayers/audioplayers.dart' as audioplayers;
 import 'package:vibe_music_app/src/models/song_model.dart';
 import 'package:vibe_music_app/src/models/enums.dart';
+
+// 桌面端使用 audioplayers
+import 'package:audioplayers/audioplayers.dart' as audioplayers;
 
 /// 音频播放器服务
 /// 负责处理音频播放相关的所有功能
@@ -38,6 +39,12 @@ class AudioPlayerService {
 
   /// 随机播放模式
   bool _isShuffle = false;
+
+  /// 播放列表
+  List<Song> _playlist = [];
+
+  /// 当前播放索引
+  int _currentIndex = 0;
 
   /// 用于频繁变化数据的流控制器
   final _positionStreamController = StreamController<Duration>.broadcast();
@@ -225,6 +232,8 @@ class AudioPlayerService {
 
     // 设置默认循环模式
     _audioPlayer!.setLoopMode(LoopMode.off);
+
+    AppLogger().d('✅ just_audio_background 已在 main.dart 中初始化');
   }
 
   /// 歌曲播放完成时的处理
@@ -262,7 +271,8 @@ class AudioPlayerService {
     try {
       if (!isDesktop) {
         // 非桌面端平台，使用 just_audio 播放器
-        await _playSongWithJustAudio(song);
+        // 创建只有这首歌的播放列表，以支持通知栏的上一首/下一首按钮
+        await setPlaylist([song], startIndex: 0);
       } else {
         // 桌面端平台，使用 audioplayers 播放器
         await _playSongWithAudioPlayers(song);
@@ -273,25 +283,6 @@ class AudioPlayerService {
       _playerState = AppPlayerState.stopped;
       _playerStateStreamController.add(_playerState);
     }
-  }
-
-  /// 使用 just_audio 播放歌曲
-  Future<void> _playSongWithJustAudio(Song song) async {
-    if (_audioPlayer == null) {
-      throw Exception('音频播放器未初始化');
-    }
-
-    // 重置播放器
-    await _audioPlayer!.stop();
-    // 设置音频源
-    AppLogger().d('使用 just_audio 准备从URL播放音频');
-    await _audioPlayer!.setUrl(song.songUrl!);
-    // 播放歌曲
-    await _audioPlayer!.play();
-    _playerState = AppPlayerState.playing;
-    _playerStateStreamController.add(_playerState);
-    AppLogger().d('使用 just_audio 成功开始播放歌曲: ${song.songName}');
-    AppLogger().d('播放后音频播放器状态: ${_audioPlayer!.playerState}');
   }
 
   /// 使用 audioplayers 播放歌曲
@@ -368,8 +359,9 @@ class AudioPlayerService {
     }
   }
 
-  /// 停止播放
+  /// 停止播放并清除通知栏
   Future<void> stop() async {
+    AppLogger().d('停止播放并清除通知栏');
     // 检查是否为桌面端平台（不包括web）
     final isDesktop = _isDesktop;
 
@@ -517,6 +509,111 @@ class AudioPlayerService {
       AppLogger().e('❌ 准备音频播放器失败: $e');
       _playerState = AppPlayerState.stopped;
       _playerStateStreamController.add(_playerState);
+    }
+  }
+
+  /// 设置播放列表并播放指定歌曲
+  /// [playlist] 播放列表
+  /// [startIndex] 起始播放索引，默认为0
+  Future<void> setPlaylist(List<Song> playlist, {int startIndex = 0}) async {
+    if (playlist.isEmpty) return;
+
+    _playlist = playlist;
+    _currentIndex = startIndex.clamp(0, playlist.length - 1);
+
+    // 检查是否为桌面端平台
+    final isDesktop = _isDesktop;
+
+    if (!isDesktop) {
+      await _playPlaylistWithJustAudio(startIndex);
+    } else {
+      await playSong(playlist[startIndex]);
+    }
+  }
+
+  /// 使用 just_audio 播放播放列表
+  Future<void> _playPlaylistWithJustAudio(int startIndex) async {
+    if (_audioPlayer == null || _playlist.isEmpty) {
+      throw Exception('音频播放器未初始化或播放列表为空');
+    }
+
+    // 创建音频源列表
+    final audioSources = _playlist.map((song) {
+      return AudioSource.uri(
+        Uri.parse(song.songUrl!),
+        tag: MediaItem(
+          id: song.id?.toString() ?? song.songUrl!,
+          album: song.albumName,
+          title: song.songName ?? '未知歌曲',
+          artist: song.artistName ?? '未知艺术家',
+          artUri: song.coverUrl != null ? Uri.parse(song.coverUrl!) : null,
+        ),
+      );
+    }).toList();
+
+    // 创建 ConcatenatingAudioSource 来支持上一首/下一首
+    final concatenatingSource = ConcatenatingAudioSource(
+      children: audioSources,
+      useLazyPreparation: true,
+    );
+
+    // 重置播放器
+    await _audioPlayer!.stop();
+
+    // 设置音频源并从指定索引开始播放
+    AppLogger().d('设置播放列表，从索引 $startIndex 开始播放');
+    await _audioPlayer!.setAudioSource(
+      concatenatingSource,
+      initialIndex: startIndex,
+      initialPosition: Duration.zero,
+    );
+
+    // 播放歌曲
+    await _audioPlayer!.play();
+    _playerState = AppPlayerState.playing;
+    _playerStateStreamController.add(_playerState);
+    AppLogger().d('播放列表设置成功，当前歌曲: ${_playlist[startIndex].songName}');
+  }
+
+  /// 播放上一首
+  Future<void> playPrevious() async {
+    if (_playlist.isEmpty) return;
+
+    // 检查是否为桌面端平台
+    final isDesktop = _isDesktop;
+
+    if (!isDesktop && _audioPlayer != null) {
+      // 移动端：使用 just_audio 的 seekToPrevious
+      if (_audioPlayer!.hasPrevious) {
+        await _audioPlayer!.seekToPrevious();
+        _currentIndex = _audioPlayer!.currentIndex ?? _currentIndex;
+        AppLogger().d('播放上一首: ${_playlist[_currentIndex].songName}');
+      }
+    } else {
+      // 桌面端或回退逻辑
+      _currentIndex = (_currentIndex - 1 + _playlist.length) % _playlist.length;
+      await playSong(_playlist[_currentIndex]);
+    }
+  }
+
+  /// 播放下一首
+  Future<void> playNext() async {
+    if (_playlist.isEmpty) return;
+
+    // 检查是否为桌面端平台
+    final isDesktop = _isDesktop;
+
+    if (!isDesktop && _audioPlayer != null) {
+      // 移动端：使用 just_audio 的 seekToNext
+      if (_audioPlayer!.hasNext) {
+        await _audioPlayer!.seekToNext();
+        _currentIndex = _audioPlayer!.currentIndex ?? _currentIndex;
+        AppLogger().d('播放下一首: ${_playlist[_currentIndex].songName}');
+      }
+    } else {
+      // 桌面端或回退逻辑
+      _currentIndex = (_currentIndex + 1) % _playlist.length;
+      await playSong(_playlist[_currentIndex]);
     }
   }
 

@@ -4,6 +4,9 @@ import 'package:vibe_music_app/src/config/app_config.dart';
 import 'package:vibe_music_app/src/utils/app_initializer.dart';
 
 Future<void> main() async {
+  // 确保 Flutter 绑定已初始化
+  WidgetsFlutterBinding.ensureInitialized();
+
   // 先初始化日志工具
   AppLogger().initialize();
 
@@ -12,4 +15,9 @@ Future<void> main() async {
 
   // 运行应用
   runApp(AppConfig.buildApp());
+
+  // 应用启动后异步初始化 just_audio_background
+  Future.delayed(Duration.zero, () async {
+    await AppInitializer.initializeJustAudioBackground();
+  });
 }

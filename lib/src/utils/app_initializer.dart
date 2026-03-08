@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:amis_flutter_utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:vibe_music_app/src/services/custom_cache_manager.dart';
 import 'package:vibe_music_app/src/utils/database/index.dart';
 import 'package:vibe_music_app/src/utils/di/dependency_injection.dart';
@@ -29,6 +32,9 @@ class AppInitializer {
       // 初始化依赖注入
       await _initializeDependencyInjection();
 
+      // 请求通知权限（Android 13+）
+      await _requestNotificationPermission();
+
       // 启动时间统计
       stopwatch.stop();
       AppLogger().d('🚀 应用初始化完成，耗时: ${stopwatch.elapsedMilliseconds}ms');
@@ -37,6 +43,29 @@ class AppInitializer {
     } catch (e) {
       AppLogger().e('❌ 应用初始化失败: $e');
       return false;
+    }
+  }
+
+  /// 初始化 just_audio_background（应用启动后异步调用）
+  static Future<void> initializeJustAudioBackground() async {
+    if (kIsWeb) return;
+    if (defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.linux) {
+      return;
+    }
+
+    try {
+      AppLogger().d('🔄 开始初始化 just_audio_background...');
+      await JustAudioBackground.init(
+        androidNotificationChannelId: 'com.amis.vibe_music_app.channel.audio',
+        androidNotificationChannelName: 'Vibe Music',
+        androidNotificationOngoing: true,
+        androidNotificationIcon: 'drawable/notification_icon',
+      );
+      AppLogger().d('✅ just_audio_background 初始化成功');
+    } catch (e) {
+      AppLogger().e('❌ just_audio_background 初始化失败: $e');
     }
   }
 
@@ -85,11 +114,28 @@ class AppInitializer {
       final cacheManager = DefaultCacheManager();
 
       // 尝试获取缓存信息来触发数据库初始化
-      final fileInfo = await cacheManager.getFileFromCache('warmup');
+      await cacheManager.getFileFromCache('warmup');
       AppLogger().d('图片缓存系统预热完成');
     } catch (e) {
       // 预热失败不影响应用启动
       AppLogger().d('图片缓存系统预热跳过: $e');
+    }
+  }
+
+  /// 请求通知权限（Android 13+）
+  static Future<void> _requestNotificationPermission() async {
+    if (kIsWeb) return;
+    if (defaultTargetPlatform != TargetPlatform.android) return;
+
+    try {
+      final status = await Permission.notification.status;
+      AppLogger().d('通知权限状态: $status');
+      if (status.isDenied) {
+        final result = await Permission.notification.request();
+        AppLogger().d('通知权限请求结果: $result');
+      }
+    } catch (e) {
+      AppLogger().e('请求通知权限失败: $e');
     }
   }
 }

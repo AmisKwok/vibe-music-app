@@ -7,6 +7,7 @@ import 'package:vibe_music_app/src/controllers/language_controller.dart';
 import 'package:vibe_music_app/src/controllers/theme_controller.dart';
 import 'package:vibe_music_app/src/routes/app_routes.dart';
 import 'package:vibe_music_app/src/services/localization_service.dart';
+import 'package:vibe_music_app/src/services/audio_player_service.dart';
 import 'package:vibe_music_app/src/theme/app_theme.dart';
 
 /// 应用配置类
@@ -104,14 +105,33 @@ class VibeMusicApp extends StatefulWidget {
   State<VibeMusicApp> createState() => _VibeMusicAppState();
 }
 
-class _VibeMusicAppState extends State<VibeMusicApp> {
+class _VibeMusicAppState extends State<VibeMusicApp>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    // 添加生命周期监听
+    WidgetsBinding.instance.addObserver(this);
     // 在首帧渲染完成后移除启动页
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FlutterNativeSplash.remove();
     });
+  }
+
+  @override
+  void dispose() {
+    // 移除生命周期监听
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // 当应用 detached（退出）时停止播放
+    if (state == AppLifecycleState.detached) {
+      AudioPlayerService().stop();
+    }
   }
 
   @override
