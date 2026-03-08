@@ -3,6 +3,14 @@ import 'package:flutter/material.dart';
 /// 应用主题配置类
 /// 定义了应用的明/暗两种主题样式
 class AppTheme {
+  /// Musike 主题配色常量
+  static const Color musikeBackground = Color(0xFFF5F5F5);
+  static const Color musikeCardBackground = Color(0xFFFAFAFA);
+  static const Color musikeTextPrimary = Color(0xFF1F2937);
+  static const Color musikeTextSecondary = Color(0xFF6B7280);
+  static const Color musikeAccent = Color(0xFF6366F1);
+  static const Color musikeAccentLight = Color(0xFF818CF8);
+
   /// 亮色主题（粉紫色调）
   static final ThemeData lightTheme = ThemeData(
     /// 亮色主题颜色方案
@@ -214,6 +222,86 @@ class AppTheme {
           color: Colors.white,
         ),
       ),
+    ),
+  );
+
+  /// Musike 主题（参考 Figma 设计）
+  static final ThemeData musikeTheme = ThemeData(
+    colorScheme: ColorScheme.light(
+      primary: musikeAccent,
+      secondary: musikeAccentLight,
+      surface: musikeCardBackground,
+      error: Colors.red.shade600,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: musikeTextPrimary,
+      onError: Colors.white,
+      brightness: Brightness.light,
+    ),
+    useMaterial3: true,
+    scaffoldBackgroundColor: musikeBackground,
+    cardTheme: CardThemeData(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 0,
+      color: musikeCardBackground,
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+    ),
+    textTheme: TextTheme(
+      headlineLarge: TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 28,
+        color: musikeTextPrimary,
+        fontFamily: 'Poppins',
+      ),
+      headlineMedium: TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 18,
+        color: musikeTextPrimary,
+        fontFamily: 'Poppins',
+      ),
+      titleMedium: TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 14,
+        color: musikeTextPrimary,
+        fontFamily: 'Poppins',
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 14,
+        color: musikeTextSecondary,
+        fontFamily: 'Poppins',
+      ),
+      bodySmall: TextStyle(
+        fontSize: 12,
+        color: musikeTextSecondary,
+        fontFamily: 'Poppins',
+      ),
+    ),
+    navigationBarTheme: NavigationBarThemeData(
+      indicatorColor: musikeAccent.withOpacity(0.1),
+      labelTextStyle: WidgetStateProperty.all(
+        TextStyle(
+          color: musikeTextPrimary,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Poppins',
+        ),
+      ),
+      iconTheme: WidgetStateProperty.all(
+        IconThemeData(
+          color: musikeTextPrimary,
+        ),
+      ),
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      titleTextStyle: TextStyle(
+        color: musikeTextPrimary,
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+        fontFamily: 'Poppins',
+      ),
+      iconTheme: IconThemeData(color: musikeTextPrimary),
     ),
   );
 }

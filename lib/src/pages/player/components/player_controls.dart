@@ -5,24 +5,34 @@ import 'package:flutter/material.dart';
 class PlayerControls extends StatelessWidget {
   /// 当前播放状态
   final bool isPlaying;
+
   /// 是否启用随机播放
   final bool isShuffle;
+
   /// 重复模式
   final String repeatMode;
+
   /// 当前音量
   final double volume;
+
   /// 播放回调
   final Function() onPlay;
+
   /// 暂停回调
   final Function() onPause;
+
   /// 上一首回调
   final Function() onPrevious;
+
   /// 下一首回调
   final Function() onNext;
+
   /// 随机播放切换回调
   final Function() onToggleShuffle;
+
   /// 重复模式切换回调
   final Function() onToggleRepeat;
+
   /// 音量控制显示回调
   final Function() onToggleVolumeControls;
 
@@ -45,7 +55,7 @@ class PlayerControls extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 400;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
@@ -61,9 +71,7 @@ class PlayerControls extends StatelessWidget {
                 size: isSmallScreen ? 20 : 24,
                 color: isShuffle
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant,
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               onPressed: onToggleShuffle,
               padding: const EdgeInsets.all(4),
@@ -100,20 +108,14 @@ class PlayerControls extends StatelessWidget {
             ),
           ),
           SizedBox(width: isSmallScreen ? 2 : 4),
-          // 音量控制
+          // 静音/取消静音
           Flexible(
             flex: 1,
             child: IconButton(
               icon: Icon(
-                volume > 0.5
-                    ? Icons.volume_up
-                    : volume > 0
-                        ? Icons.volume_down
-                        : Icons.volume_off,
+                volume > 0 ? Icons.volume_up : Icons.volume_off,
                 size: isSmallScreen ? 20 : 24,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurfaceVariant,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               onPressed: onToggleVolumeControls,
               padding: const EdgeInsets.all(4),
@@ -125,15 +127,11 @@ class PlayerControls extends StatelessWidget {
             flex: 1,
             child: IconButton(
               icon: Icon(
-                repeatMode == 'one'
-                    ? Icons.repeat_one
-                    : Icons.repeat,
+                repeatMode == 'one' ? Icons.repeat_one : Icons.repeat,
                 size: isSmallScreen ? 20 : 24,
                 color: repeatMode != 'none'
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant,
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
               ),
               onPressed: onToggleRepeat,
               padding: const EdgeInsets.all(4),

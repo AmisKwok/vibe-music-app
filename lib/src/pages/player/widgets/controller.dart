@@ -20,6 +20,7 @@ class PlayerController extends GetxController {
   var _volume = 0.5.obs;
   var _playlist = <Song>[].obs;
   var _currentIndex = 0.obs;
+  double _previousVolume = 0.5;
 
   // 提供者
   late MusicController _musicController;
@@ -353,6 +354,16 @@ class PlayerController extends GetxController {
   /// 设置音量
   void setVolume(double value) {
     _musicController.setVolume(value);
+  }
+
+  /// 切换静音
+  void toggleMute() {
+    if (_musicController.volume > 0) {
+      _previousVolume = _musicController.volume;
+      _musicController.setVolume(0);
+    } else {
+      _musicController.setVolume(_previousVolume > 0 ? _previousVolume : 0.5);
+    }
   }
 
   /// 跳转到指定位置

@@ -126,7 +126,10 @@ class VibeMusicApp extends StatelessWidget {
       themeMode = ThemeMode.dark;
     } else if (themeController.themeType.value == ThemeType.glassMorphism) {
       darkTheme = AppTheme.glassMorphismTheme;
-      themeMode = ThemeMode.dark; // 毛玻璃主题使用暗色模式
+      themeMode = ThemeMode.dark;
+    } else if (themeController.themeType.value == ThemeType.musike) {
+      lightTheme = AppTheme.musikeTheme;
+      themeMode = ThemeMode.light;
     }
 
     return GetMaterialApp(

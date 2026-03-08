@@ -41,7 +41,11 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildMobileLayout(BuildContext context, AppLocalizations localizations) {
+  Widget _buildMobileLayout(
+      BuildContext context, AppLocalizations localizations) {
+    final themeController = Get.find<ThemeController>();
+    final isMusikeTheme = themeController.isMusikeTheme();
+
     return GlassMorphismBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -54,6 +58,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 backgroundColor: Colors.transparent,
                 elevation: 0,
+                foregroundColor: isMusikeTheme ? Colors.black87 : Colors.white,
               )
             : AppBar(
                 title: Text(localizations.settings),
@@ -63,13 +68,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 backgroundColor: Colors.transparent,
                 elevation: 0,
+                foregroundColor: isMusikeTheme ? Colors.black87 : Colors.white,
               ),
         body: _buildCurrentPage(localizations),
       ),
     );
   }
 
-  Widget _buildDesktopLayout(BuildContext context, AppLocalizations localizations) {
+  Widget _buildDesktopLayout(
+      BuildContext context, AppLocalizations localizations) {
+    final themeController = Get.find<ThemeController>();
+    final isMusikeTheme = themeController.isMusikeTheme();
+    final textColor = isMusikeTheme ? Colors.black87 : Colors.white;
+    final iconColor = isMusikeTheme ? const Color(0xFF6366F1) : Colors.white;
+
     return GlassMorphismBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -81,21 +93,21 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   if (_currentLevel > 0)
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(Icons.arrow_back, color: iconColor),
                       onPressed: _goBack,
                     ),
                   Icon(
                     _getPageIcon(),
                     size: 28,
-                    color: Colors.white,
+                    color: iconColor,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     _getPageTitle(localizations),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: textColor,
                     ),
                   ),
                 ],
@@ -144,21 +156,34 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildSettingsMenu(AppLocalizations localizations) {
+    final themeController = Get.find<ThemeController>();
+    final isMusikeTheme = themeController.isMusikeTheme();
+
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         _buildMenuItem(
           icon: Icons.color_lens,
           title: localizations.theme,
+          isMusikeTheme: isMusikeTheme,
           onTap: () => _navigateToLevel(1),
         ),
-        Divider(color: Colors.white.withValues(alpha: 0.2)),
+        Divider(
+          color: isMusikeTheme
+              ? Colors.grey.shade300
+              : Colors.white.withValues(alpha: 0.2),
+        ),
         _buildMenuItem(
           icon: Icons.language,
           title: localizations.language,
+          isMusikeTheme: isMusikeTheme,
           onTap: () => _navigateToLevel(2),
         ),
-        Divider(color: Colors.white.withValues(alpha: 0.2)),
+        Divider(
+          color: isMusikeTheme
+              ? Colors.grey.shade300
+              : Colors.white.withValues(alpha: 0.2),
+        ),
       ],
     );
   }
@@ -167,33 +192,72 @@ class _SettingsPageState extends State<SettingsPage> {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
+    bool isMusikeTheme = false,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.white),
+      leading: Icon(
+        icon,
+        color: isMusikeTheme ? const Color(0xFF6366F1) : Colors.white,
+      ),
       title: Text(
         title,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: isMusikeTheme ? Colors.black87 : Colors.white,
           fontSize: 16,
         ),
       ),
-      trailing: Icon(Icons.chevron_right, color: Colors.white70),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: isMusikeTheme ? Colors.black54 : Colors.white70,
+      ),
       onTap: onTap,
     );
   }
 
   Widget _buildThemePage(AppLocalizations localizations) {
     final themeController = Get.find<ThemeController>();
+    final isMusikeTheme = themeController.isMusikeTheme();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: Colors.white.withValues(alpha: 0.1),
+          color: isMusikeTheme
+              ? Colors.grey.shade100
+              : Colors.white.withValues(alpha: 0.1),
         ),
         child: Obx(() => Column(
               children: [
+                RadioListTile<ThemeType>(
+                  value: ThemeType.musike,
+                  groupValue: themeController.themeType.value,
+                  onChanged: (value) {
+                    if (value != null) {
+                      themeController.changeTheme(value);
+                    }
+                  },
+                  title: Text(
+                    'Musike',
+                    style: TextStyle(
+                      color: isMusikeTheme ? Colors.black87 : Colors.white,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Modern Music UI',
+                    style: TextStyle(
+                      color: isMusikeTheme ? Colors.black54 : Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                  activeColor: const Color(0xFF6366F1),
+                ),
+                Divider(
+                  color: isMusikeTheme
+                      ? Colors.grey.shade300
+                      : Colors.white.withValues(alpha: 0.2),
+                  height: 1,
+                ),
                 RadioListTile<ThemeType>(
                   value: ThemeType.dark,
                   groupValue: themeController.themeType.value,
@@ -204,11 +268,18 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   title: Text(
                     localizations.darkMode,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: isMusikeTheme ? Colors.black87 : Colors.white,
+                    ),
                   ),
-                  activeColor: Colors.blue,
+                  activeColor: const Color(0xFF6366F1),
                 ),
-                Divider(color: Colors.white.withValues(alpha: 0.2), height: 1),
+                Divider(
+                  color: isMusikeTheme
+                      ? Colors.grey.shade300
+                      : Colors.white.withValues(alpha: 0.2),
+                  height: 1,
+                ),
                 RadioListTile<ThemeType>(
                   value: ThemeType.glassMorphism,
                   groupValue: themeController.themeType.value,
@@ -219,9 +290,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                   title: Text(
                     localizations.glassMorphismMode,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: isMusikeTheme ? Colors.black87 : Colors.white,
+                    ),
                   ),
-                  activeColor: Colors.blue,
+                  activeColor: const Color(0xFF6366F1),
                 ),
               ],
             )),
@@ -231,13 +304,17 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildLanguagePage(AppLocalizations localizations) {
     final languageController = Get.find<LanguageController>();
+    final themeController = Get.find<ThemeController>();
+    final isMusikeTheme = themeController.isMusikeTheme();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          color: Colors.white.withValues(alpha: 0.1),
+          color: isMusikeTheme
+              ? Colors.grey.shade100
+              : Colors.white.withValues(alpha: 0.1),
         ),
         child: Obx(() => Column(
               children: languageController.languageOptions.map((option) {
@@ -271,12 +348,19 @@ class _SettingsPageState extends State<SettingsPage> {
                       },
                       title: Text(
                         displayName,
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: isMusikeTheme ? Colors.black87 : Colors.white,
+                        ),
                       ),
-                      activeColor: Colors.blue,
+                      activeColor: const Color(0xFF6366F1),
                     ),
                     if (option != languageController.languageOptions.last)
-                      Divider(color: Colors.white.withValues(alpha: 0.2), height: 1),
+                      Divider(
+                        color: isMusikeTheme
+                            ? Colors.grey.shade300
+                            : Colors.white.withValues(alpha: 0.2),
+                        height: 1,
+                      ),
                   ],
                 );
               }).toList(),
