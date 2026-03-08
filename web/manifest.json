@@ -1,11 +1,11 @@
 {
-    "name": "vibe_music_app",
-    "short_name": "vibe_music_app",
+    "name": "Vibe Music",
+    "short_name": "Vibe Music",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#hexcode",
-    "theme_color": "#hexcode",
-    "description": "A new Flutter project.",
+    "background_color": "#6366F1",
+    "theme_color": "#6366F1",
+    "description": "A music player app",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -9,18 +9,31 @@ import 'package:vibe_music_app/src/pages/player/components/player_progress_bar.d
 import 'package:vibe_music_app/src/pages/player/components/player_controls.dart';
 import 'package:vibe_music_app/src/pages/player/components/player_playlist.dart';
 import 'package:vibe_music_app/src/utils/glass_morphism/responsive_layout.dart';
-import 'package:vibe_music_app/src/utils/extensions/color_extension.dart';
 import 'package:vibe_music_app/src/theme/app_theme.dart';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 
 class PlayerView extends GetView<PlayerController> {
   const PlayerView({super.key});
+
+  /// 检查是否为 Web 或桌面端平台
+  bool get _isWebOrDesktop {
+    return kIsWeb ||
+        defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.linux;
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDesktop = ScreenSize.isDesktop(context);
     final themeController = Get.find<ThemeController>();
     final isMusikeTheme = themeController.isMusikeTheme();
+
+    // Web 和桌面端始终使用默认播放器样式
+    if (_isWebOrDesktop) {
+      return _buildDefaultPlayer(context, isDesktop);
+    }
 
     if (isMusikeTheme) {
       return _buildMusikePlayer(context);
