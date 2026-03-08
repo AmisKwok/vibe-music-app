@@ -14,23 +14,33 @@ class GlassMorphismBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
     final isGlassMorphism = themeController.isGlassMorphismTheme();
+    final isMusikeTheme = themeController.isMusikeTheme();
 
-    return isGlassMorphism
-        ? Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF6366F1), // 靛蓝色
-                  Color(0xFF8B5CF6), // 紫色
-                  Color(0xFFEC4899), // 粉红色
-                ],
-              ),
-            ),
-            child: child,
-          )
-        : child;
+    if (isGlassMorphism) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF6366F1),
+              Color(0xFF8B5CF6),
+              Color(0xFFEC4899),
+            ],
+          ),
+        ),
+        child: child,
+      );
+    }
+
+    if (isMusikeTheme) {
+      return Container(
+        color: const Color(0xFFF5F5F5),
+        child: child,
+      );
+    }
+
+    return child;
   }
 }
 

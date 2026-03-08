@@ -168,21 +168,12 @@ class _SettingsPageState extends State<SettingsPage> {
           isMusikeTheme: isMusikeTheme,
           onTap: () => _navigateToLevel(1),
         ),
-        Divider(
-          color: isMusikeTheme
-              ? Colors.grey.shade300
-              : Colors.white.withValues(alpha: 0.2),
-        ),
+        const SizedBox(height: 12),
         _buildMenuItem(
           icon: Icons.language,
           title: localizations.language,
           isMusikeTheme: isMusikeTheme,
           onTap: () => _navigateToLevel(2),
-        ),
-        Divider(
-          color: isMusikeTheme
-              ? Colors.grey.shade300
-              : Colors.white.withValues(alpha: 0.2),
         ),
       ],
     );
@@ -194,21 +185,65 @@ class _SettingsPageState extends State<SettingsPage> {
     required VoidCallback onTap,
     bool isMusikeTheme = false,
   }) {
+    if (isMusikeTheme) {
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: ListTile(
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              icon,
+              color: const Color(0xFF6366F1),
+              size: 20,
+            ),
+          ),
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          trailing: Icon(
+            Icons.chevron_right,
+            color: Colors.black45,
+          ),
+          onTap: onTap,
+        ),
+      );
+    }
+
     return ListTile(
       leading: Icon(
         icon,
-        color: isMusikeTheme ? const Color(0xFF6366F1) : Colors.white,
+        color: Colors.white,
       ),
       title: Text(
         title,
-        style: TextStyle(
-          color: isMusikeTheme ? Colors.black87 : Colors.white,
+        style: const TextStyle(
+          color: Colors.white,
           fontSize: 16,
         ),
       ),
       trailing: Icon(
         Icons.chevron_right,
-        color: isMusikeTheme ? Colors.black54 : Colors.white70,
+        color: Colors.white70,
       ),
       onTap: onTap,
     );
@@ -220,84 +255,127 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: Container(
+      child: Obx(() => Column(
+            children: [
+              _buildThemeOption(
+                value: ThemeType.musike,
+                groupValue: themeController.themeType.value,
+                title: 'Musike',
+                subtitle: 'Modern Music UI',
+                isMusikeTheme: isMusikeTheme,
+                onChanged: (value) {
+                  if (value != null) {
+                    themeController.changeTheme(value);
+                  }
+                },
+              ),
+              const SizedBox(height: 12),
+              _buildThemeOption(
+                value: ThemeType.dark,
+                groupValue: themeController.themeType.value,
+                title: localizations.darkMode,
+                subtitle: null,
+                isMusikeTheme: isMusikeTheme,
+                onChanged: (value) {
+                  if (value != null) {
+                    themeController.changeTheme(value);
+                  }
+                },
+              ),
+              const SizedBox(height: 12),
+              _buildThemeOption(
+                value: ThemeType.glassMorphism,
+                groupValue: themeController.themeType.value,
+                title: localizations.glassMorphismMode,
+                subtitle: null,
+                isMusikeTheme: isMusikeTheme,
+                onChanged: (value) {
+                  if (value != null) {
+                    themeController.changeTheme(value);
+                  }
+                },
+              ),
+            ],
+          )),
+    );
+  }
+
+  Widget _buildThemeOption({
+    required ThemeType value,
+    required ThemeType groupValue,
+    required String title,
+    String? subtitle,
+    required bool isMusikeTheme,
+    required ValueChanged<ThemeType?> onChanged,
+  }) {
+    final isSelected = value == groupValue;
+
+    if (isMusikeTheme) {
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
         decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          color: isMusikeTheme
-              ? Colors.grey.shade100
-              : Colors.white.withValues(alpha: 0.1),
+          border: isSelected
+              ? Border.all(color: const Color(0xFF6366F1), width: 2)
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              spreadRadius: 1,
+            ),
+          ],
         ),
-        child: Obx(() => Column(
-              children: [
-                RadioListTile<ThemeType>(
-                  value: ThemeType.musike,
-                  groupValue: themeController.themeType.value,
-                  onChanged: (value) {
-                    if (value != null) {
-                      themeController.changeTheme(value);
-                    }
-                  },
-                  title: Text(
-                    'Musike',
-                    style: TextStyle(
-                      color: isMusikeTheme ? Colors.black87 : Colors.white,
-                    ),
+        child: RadioListTile<ThemeType>(
+          value: value,
+          groupValue: groupValue,
+          onChanged: onChanged,
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          subtitle: subtitle != null
+              ? Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 12,
                   ),
-                  subtitle: Text(
-                    'Modern Music UI',
-                    style: TextStyle(
-                      color: isMusikeTheme ? Colors.black54 : Colors.white70,
-                      fontSize: 12,
-                    ),
-                  ),
-                  activeColor: const Color(0xFF6366F1),
+                )
+              : null,
+          activeColor: const Color(0xFF6366F1),
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: RadioListTile<ThemeType>(
+        value: value,
+        groupValue: groupValue,
+        onChanged: onChanged,
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white),
+        ),
+        subtitle: subtitle != null
+            ? Text(
+                subtitle,
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
                 ),
-                Divider(
-                  color: isMusikeTheme
-                      ? Colors.grey.shade300
-                      : Colors.white.withValues(alpha: 0.2),
-                  height: 1,
-                ),
-                RadioListTile<ThemeType>(
-                  value: ThemeType.dark,
-                  groupValue: themeController.themeType.value,
-                  onChanged: (value) {
-                    if (value != null) {
-                      themeController.changeTheme(value);
-                    }
-                  },
-                  title: Text(
-                    localizations.darkMode,
-                    style: TextStyle(
-                      color: isMusikeTheme ? Colors.black87 : Colors.white,
-                    ),
-                  ),
-                  activeColor: const Color(0xFF6366F1),
-                ),
-                Divider(
-                  color: isMusikeTheme
-                      ? Colors.grey.shade300
-                      : Colors.white.withValues(alpha: 0.2),
-                  height: 1,
-                ),
-                RadioListTile<ThemeType>(
-                  value: ThemeType.glassMorphism,
-                  groupValue: themeController.themeType.value,
-                  onChanged: (value) {
-                    if (value != null) {
-                      themeController.changeTheme(value);
-                    }
-                  },
-                  title: Text(
-                    localizations.glassMorphismMode,
-                    style: TextStyle(
-                      color: isMusikeTheme ? Colors.black87 : Colors.white,
-                    ),
-                  ),
-                  activeColor: const Color(0xFF6366F1),
-                ),
-              ],
-            )),
+              )
+            : null,
+        activeColor: const Color(0xFF6366F1),
       ),
     );
   }
@@ -309,62 +387,102 @@ class _SettingsPageState extends State<SettingsPage> {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: isMusikeTheme
-              ? Colors.grey.shade100
-              : Colors.white.withValues(alpha: 0.1),
-        ),
-        child: Obx(() => Column(
-              children: languageController.languageOptions.map((option) {
-                String displayName;
-                switch (option.code) {
-                  case 'system':
-                    displayName = localizations.systemLanguage;
-                    break;
-                  case 'en':
-                    displayName = localizations.english;
-                    break;
-                  case 'zh':
-                    displayName = localizations.chinese;
-                    break;
-                  case 'zh_TW':
-                    displayName = localizations.traditionalChinese;
-                    break;
-                  default:
-                    displayName = option.code;
-                }
+      child: Obx(() => Column(
+            children: languageController.languageOptions.map((option) {
+              String displayName;
+              switch (option.code) {
+                case 'system':
+                  displayName = localizations.systemLanguage;
+                  break;
+                case 'en':
+                  displayName = localizations.english;
+                  break;
+                case 'zh':
+                  displayName = localizations.chinese;
+                  break;
+                case 'zh_TW':
+                  displayName = localizations.traditionalChinese;
+                  break;
+                default:
+                  displayName = option.code;
+              }
 
-                return Column(
-                  children: [
-                    RadioListTile<String>(
-                      value: option.code,
-                      groupValue: languageController.languageCode.value,
-                      onChanged: (value) {
-                        if (value != null) {
-                          languageController.changeLanguage(value);
-                        }
-                      },
-                      title: Text(
-                        displayName,
-                        style: TextStyle(
-                          color: isMusikeTheme ? Colors.black87 : Colors.white,
-                        ),
-                      ),
-                      activeColor: const Color(0xFF6366F1),
-                    ),
-                    if (option != languageController.languageOptions.last)
-                      Divider(
-                        color: isMusikeTheme
-                            ? Colors.grey.shade300
-                            : Colors.white.withValues(alpha: 0.2),
-                        height: 1,
-                      ),
-                  ],
-                );
-              }).toList(),
-            )),
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildLanguageOption(
+                  value: option.code,
+                  groupValue: languageController.languageCode.value,
+                  title: displayName,
+                  isMusikeTheme: isMusikeTheme,
+                  onChanged: (value) {
+                    if (value != null) {
+                      languageController.changeLanguage(value);
+                    }
+                  },
+                ),
+              );
+            }).toList(),
+          )),
+    );
+  }
+
+  Widget _buildLanguageOption({
+    required String value,
+    required String groupValue,
+    required String title,
+    required bool isMusikeTheme,
+    required ValueChanged<String?> onChanged,
+  }) {
+    final isSelected = value == groupValue;
+
+    if (isMusikeTheme) {
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? Border.all(color: const Color(0xFF6366F1), width: 2)
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: RadioListTile<String>(
+          value: value,
+          groupValue: groupValue,
+          onChanged: onChanged,
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          activeColor: const Color(0xFF6366F1),
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: RadioListTile<String>(
+        value: value,
+        groupValue: groupValue,
+        onChanged: onChanged,
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white),
+        ),
+        activeColor: const Color(0xFF6366F1),
       ),
     );
   }

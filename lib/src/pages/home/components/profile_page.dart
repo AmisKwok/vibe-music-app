@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vibe_music_app/generated/app_localizations.dart';
 import 'package:vibe_music_app/src/controllers/auth_controller.dart';
+import 'package:vibe_music_app/src/controllers/theme_controller.dart';
 
 import 'package:vibe_music_app/src/routes/app_routes.dart';
 
@@ -128,16 +129,9 @@ class _ProfilePageState extends State<ProfilePage> {
             if (!kIsWeb &&
                 (defaultTargetPlatform == TargetPlatform.android ||
                     defaultTargetPlatform == TargetPlatform.iOS)) ...[
-              ElevatedButton.icon(
-                onPressed: () {
-                  Get.toNamed(AppRoutes.settings);
-                },
-                icon: const Icon(Icons.settings),
-                label: Text(AppLocalizations.of(context)?.settings ?? '设置'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purpleAccent,
-                  foregroundColor: Colors.white,
-                ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: _buildSettingsButton(context),
               ),
               const SizedBox(height: 32),
             ],
@@ -566,5 +560,82 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       }
     }
+  }
+
+  Widget _buildSettingsButton(BuildContext context) {
+    final themeController = Get.find<ThemeController>();
+    final isMusikeTheme = themeController.isMusikeTheme();
+
+    if (isMusikeTheme) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              spreadRadius: 1,
+            ),
+          ],
+        ),
+        child: ListTile(
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF6366F1).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.settings,
+              color: Color(0xFF6366F1),
+              size: 20,
+            ),
+          ),
+          title: Text(
+            AppLocalizations.of(context)?.settings ?? '设置',
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          trailing: const Icon(
+            Icons.chevron_right,
+            color: Colors.black45,
+          ),
+          onTap: () {
+            Get.toNamed(AppRoutes.settings);
+          },
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: const Icon(
+          Icons.settings,
+          color: Colors.white,
+        ),
+        title: Text(
+          AppLocalizations.of(context)?.settings ?? '设置',
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+        ),
+        trailing: const Icon(
+          Icons.chevron_right,
+          color: Colors.white70,
+        ),
+        onTap: () {
+          Get.toNamed(AppRoutes.settings);
+        },
+      ),
+    );
   }
 }
