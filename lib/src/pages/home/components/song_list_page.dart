@@ -6,6 +6,8 @@ import 'package:vibe_music_app/generated/app_localizations.dart';
 import 'package:vibe_music_app/src/controllers/auth_controller.dart';
 import 'package:vibe_music_app/src/controllers/music_controller.dart';
 import 'package:vibe_music_app/src/models/song_model.dart';
+import 'package:vibe_music_app/src/models/banner_model.dart';
+import 'package:vibe_music_app/src/services/api_service.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:vibe_music_app/src/components/pull_to_refresh.dart';
 import 'package:vibe_music_app/src/services/image_preload_service.dart';
@@ -30,14 +32,14 @@ enum SongListType {
 
 /// 轮播图数据模型
 class CarouselItem {
-  final String imageUrl; // 图片URL
-  final String title; // 标题
-  final String description; // 描述
+  final String imageUrl;
+  final String? title;
+  final String? description;
 
   CarouselItem({
     required this.imageUrl,
-    required this.title,
-    required this.description,
+    this.title,
+    this.description,
   });
 }
 
@@ -56,28 +58,23 @@ class PlaylistItem {
 
 class _SongListPageState extends State<SongListPage>
     with AutomaticKeepAliveClientMixin<SongListPage> {
-  late Future<List<Song>> _futureSongs = Future.value([]); // 歌曲数据未来
-  final Map<int, bool> _favoriteLoadingStates = {}; // 收藏操作加载状态
-  int _currentCarouselIndex = 0; // 当前轮播图索引
+  late Future<List<Song>> _futureSongs = Future.value([]);
+  final Map<int, bool> _favoriteLoadingStates = {};
+  int _currentCarouselIndex = 0;
 
-  /// 轮播图数据
-  final List<CarouselItem> _carouselItems = [
-    CarouselItem(
-      imageUrl: 'https://picsum.photos/id/1015/800/400',
-      title: '一周欧美上新',
-      description: '编辑精选最新欧美热歌，每周更新',
-    ),
-    CarouselItem(
-      imageUrl: 'https://picsum.photos/id/1019/800/400',
-      title: '经典华语歌曲',
-      description: '华语音乐黄金时代，永恒的经典',
-    ),
-    CarouselItem(
-      imageUrl: 'https://picsum.photos/id/1025/800/400',
-      title: '日韩流行音乐',
-      description: '最新日韩流行歌曲，引领潮流',
-    ),
-  ];
+  List<BannerModel> _banners = [];
+  bool _isLoadingBanners = true;
+
+  List<CarouselItem> get _carouselItems {
+    if (_banners.isEmpty) {
+      return [];
+    }
+    return _banners
+        .map((banner) => CarouselItem(
+              imageUrl: banner.bannerUrl ?? '',
+            ))
+        .toList();
+  }
 
   /// 推荐歌单数据
   final List<PlaylistItem> _recommendedPlaylists = [
@@ -119,10 +116,39 @@ class _SongListPageState extends State<SongListPage>
   @override
   void initState() {
     super.initState();
-    // 在initState中只加载一次歌曲数据
     _loadSongs();
-    // 监听滚动事件，实现加载更多
+    _loadBanners();
     _scrollController.addListener(_onScroll);
+  }
+
+  Future<void> _loadBanners() async {
+    setState(() {
+      _isLoadingBanners = true;
+    });
+
+    try {
+      final response = await ApiService().getBannerList();
+      if (response.statusCode == 200 && response.data['code'] == 200) {
+        final List<dynamic> bannerList = response.data['data'] ?? [];
+        setState(() {
+          _banners =
+              bannerList.map((json) => BannerModel.fromJson(json)).toList();
+          _isLoadingBanners = false;
+        });
+        if (_carouselItems.isNotEmpty && mounted) {
+          ImagePreloadService().preloadCarouselImages(_carouselItems, context);
+        }
+      } else {
+        setState(() {
+          _isLoadingBanners = false;
+        });
+      }
+    } catch (e) {
+      AppLogger().e('加载Banner数据失败: $e');
+      setState(() {
+        _isLoadingBanners = false;
+      });
+    }
   }
 
   @override
@@ -327,14 +353,7 @@ class _SongListPageState extends State<SongListPage>
 
   /// 预加载图片
   void _preloadImages() {
-    // 预加载轮播图图片
-    if (_carouselItems.isNotEmpty) {
-      // 直接执行预加载操作
-      ImagePreloadService().preloadCarouselImages(_carouselItems, context);
-    }
-    // 预加载推荐歌单图片
     if (_recommendedPlaylists.isNotEmpty) {
-      // 直接执行预加载操作
       ImagePreloadService()
           .preloadPlaylistImages(_recommendedPlaylists, context);
     }
@@ -493,6 +512,26 @@ class _SongListPageState extends State<SongListPage>
 
   /// 构建轮播图
   Widget _buildCarousel() {
+    if (_isLoadingBanners) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Container(
+          height: 240.0,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      );
+    }
+
+    if (_carouselItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -523,9 +562,7 @@ class _SongListPageState extends State<SongListPage>
                   return MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: GestureDetector(
-                      onTap: () {
-                        // 这里可以添加点击轮播图的处理逻辑
-                      },
+                      onTap: () {},
                       child: Container(
                         width: MediaQuery.of(context).size.width,
                         margin: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -542,101 +579,31 @@ class _SongListPageState extends State<SongListPage>
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20.0),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              // 轮播图图片
-                              ImageLoader.buildCachedNetworkImage(
-                                item.imageUrl,
-                                fit: BoxFit.cover,
-                                width: 1000,
-                                height: 500,
-                                cacheWidth: 800,
-                                cacheHeight: 400,
-                                qualityLevel: ImageQualityLevel.high,
-                                placeholder: (context, url) => Container(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceContainer,
-                                  child: const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Container(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .surfaceContainer,
-                                  child: const Center(
-                                    child: Icon(Icons.image_not_supported,
-                                        size: 48),
-                                  ),
-                                ),
+                          child: ImageLoader.buildCachedNetworkImage(
+                            item.imageUrl,
+                            fit: BoxFit.cover,
+                            width: 1000,
+                            height: 500,
+                            cacheWidth: 800,
+                            cacheHeight: 400,
+                            qualityLevel: ImageQualityLevel.high,
+                            placeholder: (context, url) => Container(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainer,
+                              child: const Center(
+                                child: CircularProgressIndicator(),
                               ),
-                              // 渐变覆盖层
-                              Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    stops: const [0.0, 0.4, 0.8],
-                                    colors: [
-                                      Colors.black.withValues(alpha: 0.8),
-                                      Colors.black.withValues(alpha: 0.4),
-                                      Colors.transparent,
-                                    ],
-                                  ),
-                                ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainer,
+                              child: const Center(
+                                child:
+                                    Icon(Icons.image_not_supported, size: 48),
                               ),
-                              // 文本内容
-                              Padding(
-                                padding: const EdgeInsets.all(24.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.description,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        letterSpacing: 0.5,
-                                        shadows: [
-                                          Shadow(
-                                            color: Colors.black
-                                                .withValues(alpha: 0.6),
-                                            offset: const Offset(0, 1),
-                                            blurRadius: 3,
-                                          ),
-                                        ],
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      item.title,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 26,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.0,
-                                        shadows: [
-                                          Shadow(
-                                            color: Colors.black
-                                                .withValues(alpha: 0.6),
-                                            offset: const Offset(0, 2),
-                                            blurRadius: 4,
-                                          ),
-                                        ],
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -646,7 +613,6 @@ class _SongListPageState extends State<SongListPage>
               );
             }).toList(),
           ),
-          // 轮播图指示器
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -659,8 +625,11 @@ class _SongListPageState extends State<SongListPage>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: index == _currentCarouselIndex
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.5),
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.3),
                 ),
               );
             }).toList(),

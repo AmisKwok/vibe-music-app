@@ -528,4 +528,12 @@ class ApiService {
       'deviceInfo': deviceInfo,
     });
   }
+
+  /// 获取Banner轮播图列表
+  Future<Response> getBannerList() async {
+    AppLogger().d('=== 请求Banner列表 ===');
+    final response = await _request('GET', '/banner/getBannerList');
+    AppLogger().d('Banner响应: ${response.data}');
+    return response;
+  }
 }
