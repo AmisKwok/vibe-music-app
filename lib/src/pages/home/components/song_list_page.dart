@@ -581,7 +581,7 @@ class _SongListPageState extends State<SongListPage>
                           borderRadius: BorderRadius.circular(20.0),
                           child: ImageLoader.buildCachedNetworkImage(
                             item.imageUrl,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fitWidth,
                             width: 1000,
                             height: 500,
                             cacheWidth: 800,
