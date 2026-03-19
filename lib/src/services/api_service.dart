@@ -45,7 +45,7 @@ class ApiService {
 
   /// Dio实例
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: baseUrl,
+    baseUrl: kDebugMode ? testUrl : baseUrl,
     connectTimeout: Duration(milliseconds: timeout),
     receiveTimeout: Duration(milliseconds: timeout),
     headers: {
@@ -534,6 +534,23 @@ class ApiService {
     AppLogger().d('=== 请求Banner列表 ===');
     final response = await _request('GET', '/banner/getBannerList');
     AppLogger().d('Banner响应: ${response.data}');
+    return response;
+  }
+
+  /// 获取推荐歌单列表
+  Future<Response> getRecommendedPlaylists() async {
+    AppLogger().d('=== 请求推荐歌单列表 ===');
+    final response =
+        await _request('POST', '/playlist/getRecommendedPlaylists');
+    AppLogger().d('推荐歌单响应: ${response.data}');
+    return response;
+  }
+
+  /// 获取歌单详情
+  Future<Response> getPlaylistDetail(int playlistId) async {
+    AppLogger().d('=== 请求歌单详情 ===');
+    final response = await _request('GET', '/playlist/detail/$playlistId');
+    AppLogger().d('歌单详情响应: ${response.data}');
     return response;
   }
 }

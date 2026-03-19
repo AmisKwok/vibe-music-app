@@ -7,6 +7,7 @@ import 'package:vibe_music_app/src/controllers/auth_controller.dart';
 import 'package:vibe_music_app/src/controllers/music_controller.dart';
 import 'package:vibe_music_app/src/models/song_model.dart';
 import 'package:vibe_music_app/src/models/banner_model.dart';
+import 'package:vibe_music_app/src/models/playlist_model.dart';
 import 'package:vibe_music_app/src/services/api_service.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:vibe_music_app/src/components/pull_to_refresh.dart';
@@ -15,6 +16,7 @@ import 'package:vibe_music_app/src/utils/snackbar_manager.dart';
 import 'package:vibe_music_app/src/routes/app_routes.dart';
 import 'package:vibe_music_app/src/utils/glass_morphism/responsive_layout.dart';
 import 'package:vibe_music_app/src/pages/home/widgets/controller.dart';
+import 'package:vibe_music_app/src/pages/playlist_detail/playlist_detail_page.dart';
 
 /// 歌曲列表页面
 class SongListPage extends StatefulWidget {
@@ -45,14 +47,14 @@ class CarouselItem {
 
 /// 歌单数据模型
 class PlaylistItem {
-  final String imageUrl; // 图片URL
-  final String title; // 标题
-  final String playCount; // 播放次数
+  final String imageUrl;
+  final String title;
+  final int? playlistId;
 
   PlaylistItem({
     required this.imageUrl,
     required this.title,
-    required this.playCount,
+    this.playlistId,
   });
 }
 
@@ -76,39 +78,22 @@ class _SongListPageState extends State<SongListPage>
         .toList();
   }
 
-  /// 推荐歌单数据
-  final List<PlaylistItem> _recommendedPlaylists = [
-    PlaylistItem(
-      imageUrl: 'https://picsum.photos/id/1/300/300',
-      title: '[1963-至今] 日本经典动漫音乐大盘点',
-      playCount: '3164.1万',
-    ),
-    PlaylistItem(
-      imageUrl: 'https://picsum.photos/id/2/300/300',
-      title: '武侠影视金曲100首 | 每个人心中的江湖梦',
-      playCount: '3218.0万',
-    ),
-    PlaylistItem(
-      imageUrl: 'https://picsum.photos/id/3/300/300',
-      title: '华语青春 | 90后校园岁月的流行歌曲',
-      playCount: '3233.7万',
-    ),
-    PlaylistItem(
-      imageUrl: 'https://picsum.photos/id/4/300/300',
-      title: '经典粤语合集【无损音质】',
-      playCount: '9184.6万',
-    ),
-    PlaylistItem(
-      imageUrl: 'https://picsum.photos/id/5/300/300',
-      title: '世界古典钢琴音乐珍藏',
-      playCount: '4021.7万',
-    ),
-    PlaylistItem(
-      imageUrl: 'https://picsum.photos/id/6/300/300',
-      title: '一周日语上新 | アニメソング',
-      playCount: '9841.9万',
-    ),
-  ];
+  List<PlaylistModel> _playlists = [];
+  bool _isLoadingPlaylists = true;
+
+  List<PlaylistItem> get _recommendedPlaylists {
+    if (_playlists.isEmpty) {
+      return [];
+    }
+    final displayPlaylists = _playlists.take(4).toList();
+    return displayPlaylists
+        .map((playlist) => PlaylistItem(
+              imageUrl: playlist.coverUrl ?? '',
+              title: playlist.title ?? '',
+              playlistId: playlist.playlistId,
+            ))
+        .toList();
+  }
 
   /// 滚动控制器，用于实现加载更多功能
   final ScrollController _scrollController = ScrollController();
@@ -118,6 +103,7 @@ class _SongListPageState extends State<SongListPage>
     super.initState();
     _loadSongs();
     _loadBanners();
+    _loadPlaylists();
     _scrollController.addListener(_onScroll);
   }
 
@@ -147,6 +133,47 @@ class _SongListPageState extends State<SongListPage>
       AppLogger().e('加载Banner数据失败: $e');
       setState(() {
         _isLoadingBanners = false;
+      });
+    }
+  }
+
+  Future<void> _loadPlaylists() async {
+    setState(() {
+      _isLoadingPlaylists = true;
+    });
+
+    try {
+      AppLogger().d('开始加载推荐歌单...');
+      final response = await ApiService().getRecommendedPlaylists();
+      AppLogger().d('推荐歌单响应状态码: ${response.statusCode}');
+      AppLogger().d('推荐歌单响应数据: ${response.data}');
+
+      if (response.statusCode == 200 && response.data['code'] == 200) {
+        final List<dynamic> playlistList = response.data['data'] ?? [];
+        AppLogger().d('推荐歌单数量: ${playlistList.length}');
+
+        setState(() {
+          _playlists =
+              playlistList.map((json) => PlaylistModel.fromJson(json)).toList();
+          _isLoadingPlaylists = false;
+        });
+
+        AppLogger().d('解析后的歌单数量: ${_playlists.length}');
+
+        if (_recommendedPlaylists.isNotEmpty && mounted) {
+          ImagePreloadService()
+              .preloadPlaylistImages(_recommendedPlaylists, context);
+        }
+      } else {
+        AppLogger().e('推荐歌单接口返回失败: code=${response.data['code']}');
+        setState(() {
+          _isLoadingPlaylists = false;
+        });
+      }
+    } catch (e) {
+      AppLogger().e('加载推荐歌单数据失败: $e');
+      setState(() {
+        _isLoadingPlaylists = false;
       });
     }
   }
@@ -642,11 +669,10 @@ class _SongListPageState extends State<SongListPage>
   /// 构建推荐歌单
   Widget _buildRecommendedPlaylists() {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 375; // 针对小屏设备进行特殊处理
+    final isSmallScreen = screenWidth < 375;
     int crossAxisCount;
     final localizations = AppLocalizations.of(context)!;
 
-    // 根据屏幕宽度动态调整列数
     if (screenWidth < 600) {
       crossAxisCount = isSmallScreen ? 2 : 2;
     } else if (screenWidth < 1024) {
@@ -655,6 +681,34 @@ class _SongListPageState extends State<SongListPage>
       crossAxisCount = 4;
     } else {
       crossAxisCount = 5;
+    }
+
+    if (_isLoadingPlaylists) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              localizations.recommendedPlaylists,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              height: 180,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_recommendedPlaylists.isEmpty) {
+      return const SizedBox.shrink();
     }
 
     return Padding(
@@ -671,28 +725,27 @@ class _SongListPageState extends State<SongListPage>
                       fontWeight: FontWeight.bold,
                     ),
               ),
-              TextButton(
-                onPressed: () {
-                  // 这里可以添加查看更多歌单的逻辑
-                  Get.snackbar(
-                    '功能开发中',
-                    '查看更多歌单功能即将上线',
-                    backgroundColor: Colors.blue,
-                    colorText: Colors.white,
-                    duration: Duration(seconds: 2),
-                  );
-                },
-                child: Text(
-                  '${localizations.viewMore} >',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontSize: 14,
+              if (_playlists.length > 4)
+                TextButton(
+                  onPressed: () {
+                    Get.snackbar(
+                      '功能开发中',
+                      '查看更多歌单功能即将上线',
+                      backgroundColor: Colors.blue,
+                      colorText: Colors.white,
+                      duration: Duration(seconds: 2),
+                    );
+                  },
+                  child: Text(
+                    '${localizations.viewMore} >',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
-          //const SizedBox(height: 16.0),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -715,7 +768,13 @@ class _SongListPageState extends State<SongListPage>
                 },
                 child: GestureDetector(
                   onTap: () {
-                    // 这里可以添加点击歌单的处理逻辑
+                    if (playlist.playlistId != null) {
+                      Get.to(
+                        () => PlaylistDetailPage(
+                            playlistId: playlist.playlistId!),
+                        transition: Transition.rightToLeft,
+                      );
+                    }
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -787,7 +846,7 @@ class _SongListPageState extends State<SongListPage>
                       ),
                       const SizedBox(height: 8.0),
                       SizedBox(
-                        height: 50,
+                        height: 40,
                         child: Text(
                           playlist.title,
                           style: isSmallScreen
@@ -805,18 +864,6 @@ class _SongListPageState extends State<SongListPage>
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                      const SizedBox(height: 4.0),
-                      Text(
-                        playlist.playCount,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontSize: isSmallScreen ? 10 : 12,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
-                            ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),

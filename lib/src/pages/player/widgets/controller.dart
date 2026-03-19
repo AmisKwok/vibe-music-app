@@ -29,6 +29,9 @@ class PlayerController extends GetxController {
   // 流订阅
   late StreamSubscription<AppPlayerState> _playerStateSubscription;
 
+  // 上一次稳定的播放状态
+  bool _lastStablePlayingState = false;
+
   // 收藏加载状态
   final favoriteLoadingStates = <int, bool>{};
 
@@ -37,14 +40,22 @@ class PlayerController extends GetxController {
     super.onInit();
     _musicController = Get.find<MusicController>();
     _authController = Get.find<AuthController>();
-    // 添加自己作为MusicController的监听器
+    // 添加自己作为MusicController的监听器（用于歌曲、播放列表等变化）
     _musicController.addListener(_onMusicProviderChanged);
     // 直接监听播放器状态流，确保UI能及时更新
     _playerStateSubscription =
         _musicController.playerStateStream.listen((state) {
-      _isPlaying.value = state == AppPlayerState.playing;
-      // 强制更新UI
-      update();
+      final nowPlaying = state == AppPlayerState.playing;
+
+      // 如果状态没有变化，忽略
+      if (_lastStablePlayingState == nowPlaying) return;
+
+      // 更新状态
+      _isPlaying.value = nowPlaying;
+      _lastStablePlayingState = nowPlaying;
+
+      // 更新UI
+      update(['playerControls']);
     });
     // 初始化可观察变量
     _updateObservableVariables();
@@ -61,10 +72,8 @@ class PlayerController extends GetxController {
 
   /// 当MusicProvider状态变化时调用
   void _onMusicProviderChanged() {
-    // 更新可观察变量
+    // 更新可观察变量（不包括 _isPlaying，它由流监听器处理）
     _updateObservableVariables();
-    // 通知GetX刷新UI
-    update();
   }
 
   /// 更新可观察变量
@@ -72,12 +81,10 @@ class PlayerController extends GetxController {
     // 当播放列表为空时，确保_currentSong被设置为null
     if (_musicController.playlist.isEmpty) {
       _currentSong.value = null;
-      _isPlaying.value = false;
       _playlist.value = [];
       _currentIndex.value = 0;
     } else {
       _currentSong.value = _musicController.currentSong;
-      _isPlaying.value = _musicController.playerState == AppPlayerState.playing;
       // 创建播放列表的副本，确保UI检测到变化
       _playlist.value = [..._musicController.playlist];
       _currentIndex.value = _musicController.currentIndex;

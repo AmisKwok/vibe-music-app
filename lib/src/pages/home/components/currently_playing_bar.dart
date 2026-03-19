@@ -103,6 +103,10 @@ class _CurrentlyPlayingBarContentState
         }
         // 只有当没有滑动偏移、不在滑动状态且没有显示关闭对话框时才导航到播放页面
         if (_offset == 0 && !_isSwiping && !_isShowingCloseDialog) {
+          // 先关闭所有推入的页面，回到主页
+          if (Get.currentRoute != '/') {
+            Get.until((route) => route.isFirst);
+          }
           // 获取HomeController并切换到播放页面（索引为1）
           final homeController = Get.find<HomeController>();
           homeController.changePage(1);

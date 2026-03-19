@@ -54,6 +54,10 @@ class AudioPlayerService {
   final _volumeStreamController = StreamController<double>.broadcast();
   final _currentIndexStreamController = StreamController<int>.broadcast();
 
+  // 防抖定时器
+  Timer? _stateDebounceTimer;
+  AppPlayerState? _pendingState;
+
   /// 单例实例
   static final AudioPlayerService _instance = AudioPlayerService._internal();
 
@@ -222,8 +226,6 @@ class AudioPlayerService {
           break;
         case ProcessingState.completed:
           AppLogger().d('歌曲播放完成，hasNext=${_audioPlayer!.hasNext}');
-          // 不在这里处理，让 just_audio 自然处理播放列表切换
-          // 只有在播放列表真正结束时才设置状态
           if (_playlist.isEmpty || !_audioPlayer!.hasNext) {
             AppLogger().d('播放列表已结束');
             _playerState = AppPlayerState.completed;
@@ -232,10 +234,23 @@ class AudioPlayerService {
           return;
       }
 
-      if (_playerState != newState) {
-        _playerState = newState;
-        _playerStateStreamController.add(newState);
-      }
+      // 如果状态相同，忽略
+      if (_playerState == newState && _pendingState == null) return;
+
+      // 保存待处理状态
+      _pendingState = newState;
+
+      // 取消之前的定时器
+      _stateDebounceTimer?.cancel();
+
+      // 使用防抖，等待50ms后确认状态
+      _stateDebounceTimer = Timer(const Duration(milliseconds: 50), () {
+        if (_pendingState != null && _playerState != _pendingState) {
+          _playerState = _pendingState!;
+          _playerStateStreamController.add(_playerState);
+        }
+        _pendingState = null;
+      });
     });
 
     // 监听当前播放索引变化（自动播放下一首时触发）
@@ -345,8 +360,7 @@ class AudioPlayerService {
           throw Exception('音频播放器未初始化');
         }
         await _audioPlayer!.play();
-        _playerState = AppPlayerState.playing;
-        _playerStateStreamController.add(_playerState);
+        // just_audio 的 playerStateStream 会自动发送状态更新
         AppLogger().d('使用 just_audio 播放当前歌曲');
       } else {
         // 桌面端平台，使用 audioplayers 播放器
@@ -354,6 +368,7 @@ class AudioPlayerService {
           throw Exception('桌面端音频播放器未初始化');
         }
         await _desktopAudioPlayer!.resume();
+        // 桌面端需要手动发送状态更新
         _playerState = AppPlayerState.playing;
         _playerStateStreamController.add(_playerState);
         AppLogger().d('使用 audioplayers 播放当前歌曲');
@@ -375,15 +390,17 @@ class AudioPlayerService {
         // 非桌面端平台，使用 just_audio 播放器
         if (_audioPlayer != null) {
           await _audioPlayer!.pause();
+          // just_audio 的 playerStateStream 会自动发送状态更新
         }
       } else {
         // 桌面端平台，使用 audioplayers 播放器
         if (_desktopAudioPlayer != null) {
           await _desktopAudioPlayer!.pause();
+          // 桌面端需要手动发送状态更新
+          _playerState = AppPlayerState.paused;
+          _playerStateStreamController.add(_playerState);
         }
       }
-      _playerState = AppPlayerState.paused;
-      _playerStateStreamController.add(_playerState);
     } catch (e) {
       AppLogger().e('暂停播放失败: $e');
     }
@@ -658,6 +675,8 @@ class AudioPlayerService {
 
   /// 释放资源
   void dispose() {
+    // 取消防抖定时器
+    _stateDebounceTimer?.cancel();
     // 释放音频播放器资源
     if (_audioPlayer != null) {
       _audioPlayer!.dispose();

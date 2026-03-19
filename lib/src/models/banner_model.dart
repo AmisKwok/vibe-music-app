@@ -14,7 +14,7 @@ class BannerModel with _$BannerModel {
   factory BannerModel.fromJson(Map<String, dynamic> json) {
     return BannerModel(
       bannerId: json['bannerId'],
-      bannerUrl: json['bannerUrl']?.toString().trim(),
+      bannerUrl: json['bannerUrl']?.toString().trim().replaceAll('`', ''),
     );
   }
 }
