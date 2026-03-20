@@ -74,59 +74,47 @@ class HomeView extends GetView<HomeController> {
               ],
             ),
       bottomNavigationBar: SafeArea(
-        child: Obx(() => Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: ClipRRect(
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(24)),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: isMusikeTheme
-                            ? AppTheme.musikeBackground
-                            : Theme.of(context).colorScheme.surface,
-                        border: isMusikeTheme
-                            ? Border(
-                                top: BorderSide(
-                                  color: Colors.white.withValues(alpha: 0.3),
-                                  width: 0.5,
-                                ),
-                              )
-                            : null,
-                      ),
-                      child: NavigationBar(
-                        selectedIndex: controller.currentPage.value > 3
-                            ? 0
-                            : controller.currentPage.value,
-                        onDestinationSelected: controller.changePage,
-                        destinations: [
-                          NavigationDestination(
-                              icon: Icon(Icons.home),
-                              label:
-                                  AppLocalizations.of(context)?.home ?? '主页'),
-                          NavigationDestination(
-                              icon: Icon(Icons.play_circle),
-                              label:
-                                  AppLocalizations.of(context)?.player ?? '播放'),
-                          NavigationDestination(
-                              icon: Icon(Icons.favorite),
-                              label: AppLocalizations.of(context)?.favorites ??
-                                  '收藏'),
-                          NavigationDestination(
-                              icon: Icon(Icons.person),
-                              label: AppLocalizations.of(context)?.my ?? '我的'),
-                        ],
-                        elevation: 0,
-                        backgroundColor: Colors.transparent,
-                      ),
-                    ),
-                  ),
+        child: Obx(() => ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(24)),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isMusikeTheme
+                      ? AppTheme.musikeBackground
+                      : Theme.of(context).colorScheme.surface,
+                  border: isMusikeTheme
+                      ? Border(
+                          top: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.3),
+                            width: 0.5,
+                          ),
+                        )
+                      : null,
                 ),
-              ],
+                child: NavigationBar(
+                  selectedIndex: controller.currentPage.value > 3
+                      ? 0
+                      : controller.currentPage.value,
+                  onDestinationSelected: controller.changePage,
+                  destinations: [
+                    NavigationDestination(
+                        icon: Icon(Icons.home),
+                        label: AppLocalizations.of(context)?.home ?? '主页'),
+                    NavigationDestination(
+                        icon: Icon(Icons.play_circle),
+                        label: AppLocalizations.of(context)?.player ?? '播放'),
+                    NavigationDestination(
+                        icon: Icon(Icons.favorite),
+                        label: AppLocalizations.of(context)?.favorites ?? '收藏'),
+                    NavigationDestination(
+                        icon: Icon(Icons.person),
+                        label: AppLocalizations.of(context)?.my ?? '我的'),
+                  ],
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                ),
+              ),
             )),
       ),
     );
