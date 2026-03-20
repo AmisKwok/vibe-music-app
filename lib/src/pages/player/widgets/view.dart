@@ -172,18 +172,21 @@ class PlayerView extends GetView<PlayerController> {
                           const SizedBox(height: 90),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 24),
-                            child: StreamBuilder<Duration>(
-                              stream: controller.positionStream,
-                              builder: (context, positionSnapshot) {
-                                final position =
-                                    positionSnapshot.data ?? Duration.zero;
-                                final duration = controller.duration;
-                                return PlayerProgressBar(
-                                  position: position,
-                                  duration: duration,
-                                  onSeek: controller.seekTo,
-                                );
-                              },
+                            child: GetBuilder<PlayerController>(
+                              id: 'playerControls',
+                              builder: (_) => StreamBuilder<Duration>(
+                                stream: controller.positionStream,
+                                builder: (context, positionSnapshot) {
+                                  final position =
+                                      positionSnapshot.data ?? Duration.zero;
+                                  final duration = controller.duration;
+                                  return PlayerProgressBar(
+                                    position: position,
+                                    duration: duration,
+                                    onSeek: controller.seekTo,
+                                  );
+                                },
+                              ),
                             ),
                           ),
                           const SizedBox(height: 30),
@@ -319,19 +322,22 @@ class PlayerView extends GetView<PlayerController> {
                                 artistName: controller.currentSong?.artistName,
                               )),
                           const SizedBox(height: 40),
-                          StreamBuilder<Duration>(
-                            stream: controller.positionStream,
-                            builder: (context, positionSnapshot) {
-                              final position =
-                                  positionSnapshot.data ?? Duration.zero;
-                              final duration = controller.duration;
+                          GetBuilder<PlayerController>(
+                            id: 'playerControls',
+                            builder: (_) => StreamBuilder<Duration>(
+                              stream: controller.positionStream,
+                              builder: (context, positionSnapshot) {
+                                final position =
+                                    positionSnapshot.data ?? Duration.zero;
+                                final duration = controller.duration;
 
-                              return PlayerProgressBar(
-                                position: position,
-                                duration: duration,
-                                onSeek: controller.seekTo,
-                              );
-                            },
+                                return PlayerProgressBar(
+                                  position: position,
+                                  duration: duration,
+                                  onSeek: controller.seekTo,
+                                );
+                              },
+                            ),
                           ),
                           const SizedBox(height: 48),
                           GetBuilder<PlayerController>(

@@ -649,10 +649,6 @@ class AudioPlayerService {
   /// 从字符串解析时长并设置
   void _parseAndSetDuration(String? durationStr) {
     if (durationStr == null || durationStr.isEmpty) {
-      // 如果 duration 为空，设置一个默认值（3分钟）
-      _duration = Duration(minutes: 3);
-      _durationStreamController.add(_duration);
-      AppLogger().d('歌曲 duration 为空，设置默认时长: 3:00');
       return;
     }
 
@@ -668,8 +664,6 @@ class AudioPlayerService {
           double.tryParse(hhMmSsMatch.group(3) ?? '0')?.toInt() ?? 0;
       _duration = Duration(hours: hours, minutes: minutes, seconds: seconds);
       _durationStreamController.add(_duration);
-      AppLogger().d(
-          '从歌曲模型解析时长: ${_duration.inHours}:${_duration.inMinutes % 60}:${_duration.inSeconds % 60}');
       return;
     }
 
@@ -681,8 +675,6 @@ class AudioPlayerService {
       final seconds = double.tryParse(mmSsMatch.group(2) ?? '0')?.toInt() ?? 0;
       _duration = Duration(minutes: minutes, seconds: seconds);
       _durationStreamController.add(_duration);
-      AppLogger()
-          .d('从歌曲模型解析时长: ${_duration.inMinutes}:${_duration.inSeconds % 60}');
       return;
     }
 
@@ -692,21 +684,9 @@ class AudioPlayerService {
       if (seconds > 0) {
         _duration = Duration(seconds: seconds);
         _durationStreamController.add(_duration);
-        AppLogger()
-            .d('从歌曲模型解析时长: ${_duration.inMinutes}:${_duration.inSeconds % 60}');
-      } else {
-        // 秒数为0，设置默认值
-        _duration = Duration(minutes: 3);
-        _durationStreamController.add(_duration);
-        AppLogger().d('歌曲 duration 无效，设置默认时长: 3:00');
       }
       return;
     }
-
-    // 格式不正确，设置默认值
-    _duration = Duration(minutes: 3);
-    _durationStreamController.add(_duration);
-    AppLogger().d('歌曲 duration 格式不正确，设置默认时长: 3:00');
   }
 
   /// 播放上一首
@@ -802,8 +782,6 @@ class AudioPlayerService {
     if (duration != null && duration > Duration.zero) {
       _duration = duration;
       _durationStreamController.add(duration);
-      AppLogger()
-          .d('从音频源获取时长: ${duration.inMinutes}:${duration.inSeconds % 60}');
     } else {
       // 解析当前歌曲时长
       final currentSong = _playlist[startIndex];

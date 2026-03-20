@@ -28,6 +28,7 @@ class PlayerController extends GetxController {
 
   // 流订阅
   late StreamSubscription<AppPlayerState> _playerStateSubscription;
+  late StreamSubscription<Duration> _durationSubscription;
 
   // 上一次稳定的播放状态
   bool _lastStablePlayingState = false;
@@ -57,6 +58,11 @@ class PlayerController extends GetxController {
       // 更新UI
       update(['playerControls']);
     });
+    // 监听时长变化，确保UI能及时更新
+    _durationSubscription = _musicController.durationStream.listen((duration) {
+      // 更新UI
+      update(['playerControls']);
+    });
     // 初始化可观察变量
     _updateObservableVariables();
   }
@@ -67,6 +73,7 @@ class PlayerController extends GetxController {
     _musicController.removeListener(_onMusicProviderChanged);
     // 取消流订阅
     _playerStateSubscription.cancel();
+    _durationSubscription.cancel();
     super.onClose();
   }
 
