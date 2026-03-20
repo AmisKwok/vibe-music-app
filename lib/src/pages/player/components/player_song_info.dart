@@ -20,18 +20,26 @@ class PlayerSongInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          songName ?? (AppLocalizations.of(context)?.unknownSong ?? '未知歌曲'),
-          style: Theme.of(context).textTheme.headlineSmall,
-          textAlign: TextAlign.center,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            songName ?? (AppLocalizations.of(context)?.unknownSong ?? '未知歌曲'),
+            style: Theme.of(context).textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+          ),
         ),
         const SizedBox(height: 8),
-        Text(
-          artistName ??
-              (AppLocalizations.of(context)?.unknownArtist ?? '未知艺术家'),
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            artistName ??
+                (AppLocalizations.of(context)?.unknownArtist ?? '未知艺术家'),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
+            maxLines: 1,
+          ),
         ),
       ],
     );

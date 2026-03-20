@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 class PlayerProgressBar extends StatelessWidget {
   /// 当前播放位置
   final Duration position;
+
   /// 歌曲总时长
   final Duration duration;
+
   /// 拖动进度回调
   final Function(Duration) onSeek;
 
@@ -24,17 +26,9 @@ class PlayerProgressBar extends StatelessWidget {
       child: Column(
         children: [
           Slider(
-            value: position.inSeconds
-                .toDouble()
-                .clamp(
-                    0.0,
-                    duration.inSeconds
-                        .toDouble()
-                        .clamp(1.0,
-                            double.infinity)),
-            max: duration.inSeconds
-                .toDouble()
-                .clamp(1.0, double.infinity),
+            value: position.inSeconds.toDouble().clamp(
+                0.0, duration.inSeconds.toDouble().clamp(1.0, double.infinity)),
+            max: duration.inSeconds.toDouble().clamp(1.0, double.infinity),
             onChanged: (value) {
               onSeek(Duration(seconds: value.toInt()));
             },
@@ -42,8 +36,26 @@ class PlayerProgressBar extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_formatDuration(position)),
-              Text(_formatDuration(duration)),
+              Text(
+                _formatDuration(position),
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.9),
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                _formatDuration(duration),
+                style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.9),
+                  fontSize: 14,
+                ),
+              ),
             ],
           ),
         ],

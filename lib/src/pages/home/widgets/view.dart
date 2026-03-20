@@ -74,60 +74,59 @@ class HomeView extends GetView<HomeController> {
               ],
             ),
       bottomNavigationBar: SafeArea(
-        child: Obx(() => ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(24)),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isMusikeTheme
-                        ? AppTheme.musikeBackground
-                        : Theme.of(context).colorScheme.surface,
+        child: Obx(() => Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: ClipRRect(
                     borderRadius:
                         const BorderRadius.vertical(top: Radius.circular(24)),
-                    border: isMusikeTheme
-                        ? Border(
-                            top: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              width: 0.5,
-                            ),
-                          )
-                        : null,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        spreadRadius: 2,
-                        blurRadius: 10,
-                        offset: const Offset(0, -2),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isMusikeTheme
+                            ? AppTheme.musikeBackground
+                            : Theme.of(context).colorScheme.surface,
+                        border: isMusikeTheme
+                            ? Border(
+                                top: BorderSide(
+                                  color: Colors.white.withValues(alpha: 0.3),
+                                  width: 0.5,
+                                ),
+                              )
+                            : null,
                       ),
-                    ],
-                  ),
-                  child: NavigationBar(
-                    selectedIndex: controller.currentPage.value > 3
-                        ? 0
-                        : controller.currentPage.value,
-                    onDestinationSelected: controller.changePage,
-                    destinations: [
-                      NavigationDestination(
-                          icon: Icon(Icons.home),
-                          label: AppLocalizations.of(context)?.home ?? '主页'),
-                      NavigationDestination(
-                          icon: Icon(Icons.play_circle),
-                          label: AppLocalizations.of(context)?.player ?? '播放'),
-                      NavigationDestination(
-                          icon: Icon(Icons.favorite),
-                          label:
-                              AppLocalizations.of(context)?.favorites ?? '收藏'),
-                      NavigationDestination(
-                          icon: Icon(Icons.person),
-                          label: AppLocalizations.of(context)?.my ?? '我的'),
-                    ],
-                    elevation: 0,
-                    backgroundColor: Colors.transparent,
+                      child: NavigationBar(
+                        selectedIndex: controller.currentPage.value > 3
+                            ? 0
+                            : controller.currentPage.value,
+                        onDestinationSelected: controller.changePage,
+                        destinations: [
+                          NavigationDestination(
+                              icon: Icon(Icons.home),
+                              label:
+                                  AppLocalizations.of(context)?.home ?? '主页'),
+                          NavigationDestination(
+                              icon: Icon(Icons.play_circle),
+                              label:
+                                  AppLocalizations.of(context)?.player ?? '播放'),
+                          NavigationDestination(
+                              icon: Icon(Icons.favorite),
+                              label: AppLocalizations.of(context)?.favorites ??
+                                  '收藏'),
+                          NavigationDestination(
+                              icon: Icon(Icons.person),
+                              label: AppLocalizations.of(context)?.my ?? '我的'),
+                        ],
+                        elevation: 0,
+                        backgroundColor: Colors.transparent,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+              ],
             )),
       ),
     );
@@ -405,52 +404,44 @@ class TopNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          height: 70,
-          decoration: BoxDecoration(
-            color: isMusikeTheme
-                ? Colors.white.withValues(alpha: 0.8)
-                : Theme.of(context).colorScheme.surface,
-            border: isMusikeTheme
-                ? Border(
-                    bottom: BorderSide(
-                      color: Colors.white.withValues(alpha: 0.3),
-                      width: 0.5,
-                    ),
-                  )
-                : null,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                spreadRadius: 2,
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    title is Text
-                        ? (title as Text).data ?? ''
-                        : title.toString(),
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isMusikeTheme ? Colors.black87 : Colors.white,
-                        ),
-                  ),
+    return Container(
+      decoration: BoxDecoration(
+        color: isMusikeTheme
+            ? Colors.white.withValues(alpha: 0.8)
+            : Theme.of(context).colorScheme.surface,
+        border: isMusikeTheme
+            ? Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  width: 0.5,
                 ),
-                if (actions != null) Row(children: actions!),
-              ],
-            ),
+              )
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            spreadRadius: 2,
+            blurRadius: 10,
+            offset: const Offset(0, 2),
           ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                title is Text ? (title as Text).data ?? '' : title.toString(),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isMusikeTheme ? Colors.black87 : Colors.white,
+                    ),
+              ),
+            ),
+            if (actions != null) Row(children: actions!),
+          ],
         ),
       ),
     );
