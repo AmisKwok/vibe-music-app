@@ -168,7 +168,7 @@ class AppTheme {
     colorScheme: ColorScheme.dark(
       primary: const Color(0xFF6366F1), // 靛蓝色
       secondary: const Color(0xFFEC4899), // 粉红色
-      surface: Colors.black.withOpacity(0.2),
+      surface: Colors.black.withValues(alpha: 0.2),
       error: Colors.red.shade400,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
@@ -177,11 +177,11 @@ class AppTheme {
       brightness: Brightness.dark,
     ),
     useMaterial3: true,
-    scaffoldBackgroundColor: Colors.black.withOpacity(0.1),
+    scaffoldBackgroundColor: Colors.black.withValues(alpha: 0.1),
     cardTheme: CardThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 0,
-      color: Colors.black.withOpacity(0.2),
+      color: Colors.black.withValues(alpha: 0.2),
       margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
     ),
     textTheme: TextTheme(
@@ -210,7 +210,7 @@ class AppTheme {
       ),
     ),
     navigationBarTheme: NavigationBarThemeData(
-      indicatorColor: Colors.white.withOpacity(0.1),
+      indicatorColor: Colors.white.withValues(alpha: 0.1),
       labelTextStyle: WidgetStateProperty.all(
         const TextStyle(
           color: Colors.white,
@@ -278,7 +278,7 @@ class AppTheme {
       ),
     ),
     navigationBarTheme: NavigationBarThemeData(
-      indicatorColor: musikeAccent.withOpacity(0.1),
+      indicatorColor: musikeAccent.withValues(alpha: 0.1),
       labelTextStyle: WidgetStateProperty.all(
         TextStyle(
           color: musikeTextPrimary,

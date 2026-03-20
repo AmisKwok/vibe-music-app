@@ -18,12 +18,13 @@ import 'package:vibe_music_app/src/utils/glass_morphism/responsive_layout.dart';
 import 'package:vibe_music_app/src/pages/home/widgets/controller.dart';
 import 'package:vibe_music_app/src/pages/playlist_detail/playlist_detail_page.dart';
 
-/// 歌曲列表页面
-class SongListPage extends StatefulWidget {
-  const SongListPage({super.key});
+/// 首页内容页面
+/// 包含轮播图、推荐歌单、热门歌曲等内容
+class HomeContentPage extends StatefulWidget {
+  const HomeContentPage({super.key});
 
   @override
-  State<SongListPage> createState() => _SongListPageState();
+  State<HomeContentPage> createState() => _HomeContentPageState();
 }
 
 /// 歌曲列表类型枚举
@@ -58,8 +59,8 @@ class PlaylistItem {
   });
 }
 
-class _SongListPageState extends State<SongListPage>
-    with AutomaticKeepAliveClientMixin<SongListPage> {
+class _HomeContentPageState extends State<HomeContentPage>
+    with AutomaticKeepAliveClientMixin<HomeContentPage> {
   late Future<List<Song>> _futureSongs = Future.value([]);
   final Map<int, bool> _favoriteLoadingStates = {};
   int _currentCarouselIndex = 0;

@@ -30,13 +30,13 @@ class ResponsiveLayout extends StatelessWidget {
   /// - [smallDesktopLayout]: 小桌面布局组件（可选）
   /// - [largeDesktopLayout]: 大桌面布局组件（可选）
   const ResponsiveLayout({
-    Key? key,
+    super.key,
     required this.mobileLayout,
     required this.tabletLayout,
     required this.desktopLayout,
     this.smallDesktopLayout,
     this.largeDesktopLayout,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -212,13 +212,13 @@ class AdaptiveContainer extends StatelessWidget {
   /// - [smallDesktopPadding]: 小桌面端内边距，默认32
   /// - [desktopPadding]: 桌面端内边距，默认40
   const AdaptiveContainer({
-    Key? key,
+    super.key,
     required this.child,
     this.mobilePadding = const EdgeInsets.all(16),
     this.tabletPadding = const EdgeInsets.all(24),
     this.smallDesktopPadding = const EdgeInsets.all(32),
     this.desktopPadding = const EdgeInsets.all(40),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -268,13 +268,13 @@ class AdaptiveSidebarWidth extends StatelessWidget {
   /// - [smallDesktopWidth]: 小桌面端侧边栏宽度，默认220
   /// - [desktopWidth]: 桌面端侧边栏宽度，默认240
   const AdaptiveSidebarWidth({
-    Key? key,
+    super.key,
     required this.child,
     this.mobileWidth = 60,
     this.tabletWidth = 200,
     this.smallDesktopWidth = 220,
     this.desktopWidth = 240,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -289,7 +289,7 @@ class AdaptiveSidebarWidth extends StatelessWidget {
       width = desktopWidth;
     }
 
-    return Container(
+    return SizedBox(
       width: width,
       child: child,
     );

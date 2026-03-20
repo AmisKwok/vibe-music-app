@@ -25,11 +25,11 @@ class CustomAndroidDeviceInfo {
   String get deviceId => _androidInfo?.id ?? '未知';
 
   /// 获取SDK版本号
-  String get sdkVersion => _androidInfo?.version.sdkInt?.toString() ?? '未知';
+  String get sdkVersion => _androidInfo?.version.sdkInt.toString() ?? '未知';
 
   /// 判断是否为物理设备
   String get isPhysicalDevice =>
-      _androidInfo?.isPhysicalDevice?.toString() ?? '未知';
+      _androidInfo?.isPhysicalDevice.toString() ?? '未知';
 
   /// 获取完整的设备信息Map
   Map<String, String> getDeviceInfoMap() {

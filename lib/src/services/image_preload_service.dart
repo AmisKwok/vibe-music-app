@@ -24,7 +24,6 @@ class ImagePreloadService {
   /// 私有构造函数
   ImagePreloadService._internal() {
     _initCacheManager();
-    _startCacheCleanupTimer();
   }
 
   /// 已预加载的图片URL集合，用于避免重复预加载
@@ -33,20 +32,11 @@ class ImagePreloadService {
   /// 图片缓存统计
   final Map<String, int> _imageCacheStats = {};
 
-  /// 图片加载重试次数
-  static const int _maxRetryCount = 3;
-
-  /// 图片加载重试延迟（毫秒）
-  static const int _retryDelay = 1000;
-
   /// 最大缓存图片数量
   static const int _maxCacheSize = 200;
 
   /// 缓存清理阈值（当达到此阈值时开始清理）
   static const int _cacheCleanupThreshold = 150;
-
-  /// 缓存清理定时器
-  Timer? _cacheCleanupTimer;
 
   /// 初始化缓存管理器
   void _initCacheManager() {
@@ -69,21 +59,6 @@ class ImagePreloadService {
       }
     } catch (e) {
       AppLogger().e('加载预加载图片列表失败: $e');
-    }
-  }
-
-  /// 启动缓存清理定时器
-  void _startCacheCleanupTimer() {
-    // 每5分钟检查一次缓存
-    _cacheCleanupTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
-      _cleanupCacheIfNeeded();
-    });
-  }
-
-  /// 清理缓存（如果需要）
-  void _cleanupCacheIfNeeded() {
-    if (_preloadedImages.length >= _cacheCleanupThreshold) {
-      clearExpiredCache();
     }
   }
 
@@ -130,8 +105,6 @@ class ImagePreloadService {
         return 0.6;
       case ImageQualityLevel.high:
         return 1.0;
-      default:
-        return 0.6;
     }
   }
 
@@ -169,8 +142,6 @@ class ImagePreloadService {
         return {'width': 300, 'height': 300};
       case ImageQualityLevel.high:
         return {'width': 800, 'height': 800};
-      default:
-        return {'width': 300, 'height': 300};
     }
   }
 
@@ -186,8 +157,8 @@ class ImagePreloadService {
       ImageQualityLevel qualityLevel = ImageQualityLevel.medium}) async {
     try {
       // 检查网络状态
-      var connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
+      var connectivityResults = await Connectivity().checkConnectivity();
+      if (connectivityResults.contains(ConnectivityResult.none)) {
         AppLogger().d('网络不可用，跳过图片预加载: $imageUrl');
         return;
       }
@@ -214,47 +185,6 @@ class ImagePreloadService {
     } catch (e) {
       // 忽略预加载错误，不影响应用运行
       AppLogger().e('预加载图片失败: $imageUrl, 错误: $e');
-    }
-  }
-
-  /// 重试预加载图片
-  Future<void> _retryPreloadImage(
-      String imageUrl, BuildContext context, int cacheWidth, int cacheHeight,
-      [int retryCount = 0]) async {
-    if (retryCount >= _maxRetryCount) {
-      AppLogger().e('图片预加载重试失败，已达到最大重试次数: $imageUrl');
-      return;
-    }
-
-    try {
-      // 延迟后重试
-      await Future.delayed(Duration(milliseconds: _retryDelay));
-
-      // 使用 DefaultCacheManager 直接下载图片并缓存到磁盘
-      final file = await DefaultCacheManager().getSingleFile(
-        imageUrl,
-        headers: {},
-      );
-      AppLogger().d('✅ 图片预加载重试成功: $imageUrl, 缓存路径: ${file.path}');
-    } catch (e) {
-      AppLogger().e('图片预加载重试失败 ($retryCount): $imageUrl, 错误: $e');
-      // 递归重试
-      _retryPreloadImage(
-          imageUrl, context, cacheWidth, cacheHeight, retryCount + 1);
-    }
-  }
-
-  /// 根据质量级别获取图片质量
-  int _getImageQuality(ImageQualityLevel qualityLevel) {
-    switch (qualityLevel) {
-      case ImageQualityLevel.low:
-        return 70;
-      case ImageQualityLevel.medium:
-        return 85;
-      case ImageQualityLevel.high:
-        return 100;
-      default:
-        return 85;
     }
   }
 

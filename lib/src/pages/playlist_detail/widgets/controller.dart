@@ -46,6 +46,7 @@ class PlaylistDetailController extends GetxController {
     }
   }
 
+  @override
   Future<void> refresh() async {
     await loadPlaylistDetail();
   }

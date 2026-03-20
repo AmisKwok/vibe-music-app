@@ -125,5 +125,10 @@
   "goToLogin": "去登入",
   "recommendedPlaylists": "推薦歌單",
   "viewMore": "查看更多",
-  "hotSongs": "熱門歌曲"
+  "hotSongs": "熱門歌曲",
+  "playlistDetail": "歌單詳情",
+  "playAll": "播放全部",
+  "removedFromFavoritesSuccess": "已取消收藏",
+  "addedToFavoritesSuccess": "已添加到收藏",
+  "showPassword": "顯示密碼"
 }

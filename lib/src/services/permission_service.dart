@@ -27,7 +27,7 @@ class PermissionService {
       } else {
         return false;
       }
-    } catch (e, stackTrace) {
+    } catch (e) {
       return false;
     }
   }
@@ -37,6 +37,8 @@ class PermissionService {
     try {
       // 请求通知权限
       await requestNotificationPermission();
-    } catch (e, stackTrace) {}
+    } catch (e) {
+      // 忽略权限请求错误
+    }
   }
 }

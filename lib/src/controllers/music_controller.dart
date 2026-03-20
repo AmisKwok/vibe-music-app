@@ -97,28 +97,60 @@ class MusicController extends GetxController {
   /// 从存储中加载上次播放的歌曲和位置
   Future<void> _restorePlayState() async {
     try {
+      AppLogger().d('🔄 开始恢复播放状态');
+
       // 加载最后播放的歌曲
       final lastPlayedSong = await _playlistManager.loadLastPlayedSong();
-      if (lastPlayedSong == null) return;
+      if (lastPlayedSong == null) {
+        AppLogger().d('⚠️  没有找到最后播放的歌曲');
+        return;
+      }
 
       // 加载播放列表
       final playlist = _playlistManager.playlist;
-      if (playlist.isEmpty) return;
+      if (playlist.isEmpty) {
+        AppLogger().d('⚠️  播放列表为空，尝试只恢复最后播放的歌曲');
+        // 如果播放列表为空，只播放最后播放的歌曲
+        if (lastPlayedSong.songUrl != null &&
+            lastPlayedSong.songUrl!.isNotEmpty) {
+          await _audioPlayerService.preparePlayer(lastPlayedSong);
+          update();
+          AppLogger().d('✅ 恢复单首歌曲播放状态: ${lastPlayedSong.songName}');
+        }
+        return;
+      }
 
       // 查找歌曲索引
       final index = _playlistManager.findSongIndex(lastPlayedSong, playlist);
       if (index >= 0) {
         _playlistManager.currentIndex = index;
-        AppLogger().d('✅ 恢复播放状态，最后播放的歌曲: ${lastPlayedSong.songName}');
+        AppLogger()
+            .d('✅ 恢复播放状态，最后播放的歌曲: ${lastPlayedSong.songName}，索引: $index');
 
-        // 准备音频播放器
-        await _audioPlayerService.preparePlayer(lastPlayedSong);
+        // 设置播放列表（不自动播放）
+        await _audioPlayerService.setPlaylistWithoutPlaying(playlist,
+            startIndex: index);
 
         // 通知 UI 更新
         update();
+      } else {
+        AppLogger().w('⚠️  未在播放列表中找到最后播放的歌曲，使用第一首歌曲');
+        // 如果未找到，使用第一首歌曲
+        _playlistManager.currentIndex = 0;
+        await _audioPlayerService.setPlaylistWithoutPlaying(playlist,
+            startIndex: 0);
+        update();
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       AppLogger().e('❌ 恢复播放状态失败: $e');
+      AppLogger().e('堆栈跟踪: $stackTrace');
+      // 恢复失败时清除旧数据，避免下次启动继续失败
+      try {
+        await _playlistManager.clearPlaylist();
+        AppLogger().d('✅ 清除旧播放列表数据');
+      } catch (clearError) {
+        AppLogger().e('❌ 清除播放列表失败: $clearError');
+      }
     }
   }
 

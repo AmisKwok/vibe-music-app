@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:vibe_music_app/generated/app_localizations.dart';
 
 class HomeController extends GetxController {
   var currentPage = 0.obs;

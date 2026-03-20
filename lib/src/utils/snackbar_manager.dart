@@ -14,10 +14,10 @@ class SnackbarManager {
   SnackbarManager._internal();
 
   /// 最大提示次数
-  static const int MAX_SNACKBAR_COUNT = 6;
+  static const int maxSnackbarCount = 6;
 
   /// 重置时间间隔（毫秒），超过此时间间隔后计数将重置为0。
-  static const int RESET_INTERVAL = 15000; // 15秒
+  static const int resetInterval = 15000; // 15秒
 
   ///  /// 提示计数
   int _snackbarCount = 0;
@@ -42,7 +42,7 @@ class SnackbarManager {
     _checkAndResetCount();
 
     // 检查是否超过最大提示次数
-    if (_snackbarCount >= MAX_SNACKBAR_COUNT) {
+    if (_snackbarCount >= maxSnackbarCount) {
       // 超过限制，不显示提示
       return;
     }
@@ -73,7 +73,7 @@ class SnackbarManager {
 
     // 检查是否超过重置时间间隔
     final timeDiff = now.difference(_lastResetTime!);
-    if (timeDiff.inMilliseconds >= RESET_INTERVAL) {
+    if (timeDiff.inMilliseconds >= resetInterval) {
       // 超过时间间隔，重置计数
       _snackbarCount = 0;
       _lastResetTime = now;
@@ -90,5 +90,5 @@ class SnackbarManager {
   int get currentCount => _snackbarCount;
 
   /// 获取是否达到最大限制
-  bool get isLimitReached => _snackbarCount >= MAX_SNACKBAR_COUNT;
+  bool get isLimitReached => _snackbarCount >= maxSnackbarCount;
 }

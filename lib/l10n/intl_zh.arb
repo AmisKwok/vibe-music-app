@@ -125,5 +125,10 @@
   "goToLogin": "去登录",
   "recommendedPlaylists": "推荐歌单",
   "viewMore": "查看更多",
-  "hotSongs": "热门歌曲"
+  "hotSongs": "热门歌曲",
+  "playlistDetail": "歌单详情",
+  "playAll": "播放全部",
+  "removedFromFavoritesSuccess": "已取消收藏",
+  "addedToFavoritesSuccess": "已添加到收藏",
+  "showPassword": "显示密码"
 }

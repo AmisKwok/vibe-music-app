@@ -1,10 +1,8 @@
 import 'package:get/get.dart';
 import 'package:vibe_music_app/src/pages/home/home_page.dart';
-import 'package:vibe_music_app/src/pages/player/player_page.dart';
 import 'package:vibe_music_app/src/pages/search/search_page.dart';
 import 'package:vibe_music_app/src/pages/auth/login/login_page.dart';
 import 'package:vibe_music_app/src/pages/auth/register/register_page.dart';
-import 'package:vibe_music_app/src/pages/favorites/favorites_page.dart';
 import 'package:vibe_music_app/src/pages/settings/settings_page.dart';
 import 'package:vibe_music_app/src/pages/settings/language_page.dart';
 import 'package:vibe_music_app/src/pages/settings/theme_page.dart';

@@ -22,6 +22,7 @@ class RegisterController extends GetxController {
   var isSendingCode = false.obs;
   var verificationSent = false.obs;
   var countdown = 0.obs;
+  var showPassword = false.obs;
   late Timer _countdownTimer;
 
   // 认证提供者
@@ -51,6 +52,11 @@ class RegisterController extends GetxController {
       _countdownTimer.cancel();
     }
     super.onClose();
+  }
+
+  /// 切换密码可见性
+  void togglePasswordVisibility() {
+    showPassword.value = !showPassword.value;
   }
 
   /// 发送验证码
@@ -123,6 +129,8 @@ class RegisterController extends GetxController {
       isLoading.value = true;
 
       try {
+        _authController.clearError();
+
         final success = await _authController.register(
             emailController.text,
             usernameController.text,

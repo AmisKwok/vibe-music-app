@@ -126,11 +126,16 @@ class PlaylistManager {
           _playlist.clear();
           for (final item in jsonList) {
             final song = Song.fromJson(item);
-            _playlist.add(song);
-            AppLogger().d('添加歌曲到播放列表: ${song.songName}');
+            // 只添加有效的歌曲（songUrl 不为空）
+            if (song.songUrl != null && song.songUrl!.isNotEmpty) {
+              _playlist.add(song);
+              AppLogger().d('添加歌曲到播放列表: ${song.songName}');
+            } else {
+              AppLogger().w('跳过无效歌曲（songUrl 为空）: ${song.songName}');
+            }
           }
           AppLogger()
-              .d('✅ 从 SharedPreferences 加载播放列表成功，共 ${_playlist.length} 首歌曲');
+              .d('✅ 从 SharedPreferences 加载播放列表成功，共 ${_playlist.length} 首有效歌曲');
           return;
         } catch (jsonError) {
           AppLogger().e('⚠️  解析 SharedPreferences 播放列表数据失败: $jsonError');

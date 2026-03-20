@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:amis_flutter_utils/utils.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -39,9 +38,6 @@ class ApiService {
 
   /// 网络连接状态
   List<ConnectivityResult> _connectionStatus = [];
-
-  /// 网络连接订阅
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   /// Dio实例
   final Dio _dio = Dio(BaseOptions(
@@ -106,7 +102,7 @@ class ApiService {
 
   /// 设置网络状态监听
   void _setupNetworkListener() {
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
+    Connectivity().onConnectivityChanged.listen(
       (List<ConnectivityResult> results) {
         _connectionStatus = results;
         AppLogger().d('网络状态变化: $_connectionStatus');
@@ -396,13 +392,7 @@ class ApiService {
   }
 
   Future<Response> updateUserAvatar(Uint8List avatarBytes) async {
-    AppLogger().d('\n=== 头像更新请求 ===');
-    AppLogger().d('头像字节长度: ${avatarBytes.length} 字节');
-    AppLogger().d('请求头: ${_dio.options.headers}');
-    AppLogger().d('=================\n');
-
     try {
-      // Create FormData with the bytes directly
       final formData = FormData.fromMap({
         'avatar': MultipartFile.fromBytes(
           avatarBytes,
@@ -410,18 +400,12 @@ class ApiService {
         ),
       });
 
-      // Log form data details
-      AppLogger().d('表单数据字段: ${formData.fields}');
-      AppLogger().d('表单文件数量: ${formData.files.length}');
-
-      // 更新头像的接口不需要Bearer前缀，临时移除它
       final originalAuthorization = _dio.options.headers['Authorization'];
       _dio.options.headers['Authorization'] = _token;
 
       Response response;
 
       try {
-        // 使用Dio直接发送请求，确保正确设置ContentType
         response = await _dio.patch(
           '/user/updateUserAvatar',
           data: formData,
@@ -431,7 +415,6 @@ class ApiService {
           ),
         );
       } finally {
-        // 恢复原来的Authorization头
         if (originalAuthorization != null) {
           _dio.options.headers['Authorization'] = originalAuthorization;
         } else {
@@ -439,18 +422,8 @@ class ApiService {
         }
       }
 
-      // Log response details
-      AppLogger().d('\n=== 头像更新响应 ===');
-      AppLogger().d('状态码: ${response.statusCode}');
-      AppLogger().d('响应数据: ${response.data}');
-      AppLogger().d('=================\n');
-
       return response;
     } catch (e) {
-      // Log error details
-      AppLogger().e('\n=== 头像更新错误 ===');
-      AppLogger().e('错误: $e');
-      AppLogger().e('=================\n');
       rethrow;
     }
   }
@@ -531,26 +504,16 @@ class ApiService {
 
   /// 获取Banner轮播图列表
   Future<Response> getBannerList() async {
-    AppLogger().d('=== 请求Banner列表 ===');
-    final response = await _request('GET', '/banner/getBannerList');
-    AppLogger().d('Banner响应: ${response.data}');
-    return response;
+    return await _request('GET', '/banner/getBannerList');
   }
 
   /// 获取推荐歌单列表
   Future<Response> getRecommendedPlaylists() async {
-    AppLogger().d('=== 请求推荐歌单列表 ===');
-    final response =
-        await _request('POST', '/playlist/getRecommendedPlaylists');
-    AppLogger().d('推荐歌单响应: ${response.data}');
-    return response;
+    return await _request('POST', '/playlist/getRecommendedPlaylists');
   }
 
   /// 获取歌单详情
   Future<Response> getPlaylistDetail(int playlistId) async {
-    AppLogger().d('=== 请求歌单详情 ===');
-    final response = await _request('GET', '/playlist/detail/$playlistId');
-    AppLogger().d('歌单详情响应: ${response.data}');
-    return response;
+    return await _request('GET', '/playlist/detail/$playlistId');
   }
 }

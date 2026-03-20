@@ -14,9 +14,11 @@ class PlaylistDetailView extends GetView<PlaylistDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Obx(() => Text(controller.playlist.value?.title ?? '歌单详情')),
+        title: Obx(() => Text(
+            controller.playlist.value?.title ?? localizations.playlistDetail)),
         actions: [
           Obx(() {
             if (controller.songs.isEmpty) {
@@ -24,7 +26,7 @@ class PlaylistDetailView extends GetView<PlaylistDetailController> {
             }
             return IconButton(
               icon: const Icon(Icons.playlist_play),
-              tooltip: '播放全部',
+              tooltip: localizations.playAll,
               onPressed: () => controller.playAll(),
             );
           }),
@@ -46,7 +48,7 @@ class PlaylistDetailView extends GetView<PlaylistDetailController> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => controller.refresh(),
-                  child: const Text('重试'),
+                  child: Text(localizations.retry),
                 ),
               ],
             ),
@@ -55,7 +57,7 @@ class PlaylistDetailView extends GetView<PlaylistDetailController> {
 
         if (controller.songs.isEmpty) {
           return Center(
-            child: Text(AppLocalizations.of(context)?.noResults ?? '暂无歌曲'),
+            child: Text(localizations.noResults),
           );
         }
 
@@ -67,118 +69,329 @@ class PlaylistDetailView extends GetView<PlaylistDetailController> {
               itemBuilder: (context, index) {
                 final song = controller.songs[index];
                 final coverUrl = song.coverUrl;
+                final isDark = Theme.of(context).brightness == Brightness.dark;
 
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: coverUrl != null
-                        ? CachedNetworkImageProvider(
-                            coverUrl,
-                            maxWidth: 100,
-                            maxHeight: 100,
-                            scale: 0.8,
-                          )
-                        : null,
-                    child:
-                        coverUrl == null ? const Icon(Icons.music_note) : null,
-                  ),
-                  title: Text(song.songName ?? '未知歌曲'),
-                  subtitle: Text(
-                    song.artistName ??
-                        (AppLocalizations.of(context)?.artist ?? '未知艺术家'),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Obx(() {
-                        final musicController = Get.find<MusicController>();
-                        final isFavorited =
-                            musicController.favoriteSongIds.contains(song.id);
-
-                        return IconButton(
-                          onPressed: () async {
-                            final authController = Get.find<AuthController>();
-                            final localizations = AppLocalizations.of(context);
-
-                            if (!authController.isAuthenticated) {
-                              Get.snackbar(
-                                localizations?.tip ?? '提示',
-                                localizations?.pleaseLogin ?? '请先登录',
-                                backgroundColor: Colors.blue,
-                                colorText: Colors.white,
-                                icon: Icon(Icons.info, color: Colors.white),
-                                duration: const Duration(seconds: 2),
-                              );
-                              Get.toNamed(AppRoutes.login);
-                              return;
-                            }
-
-                            bool success;
-                            if (isFavorited) {
-                              success = await musicController
-                                  .removeFromFavorites(song);
-                              if (success) {
-                                SnackbarManager().showSnackbar(
-                                  title: '成功',
-                                  message: '已取消收藏',
-                                  icon: Icon(Icons.check_circle,
-                                      color: Colors.white),
-                                  duration: const Duration(seconds: 2),
-                                );
-                              }
-                            } else {
-                              success =
-                                  await musicController.addToFavorites(song);
-                              if (success) {
-                                SnackbarManager().showSnackbar(
-                                  title: '成功',
-                                  message: '已添加到收藏',
-                                  icon: Icon(Icons.check_circle,
-                                      color: Colors.white),
-                                  duration: const Duration(seconds: 2),
-                                );
-                              }
-                            }
-                          },
-                          icon: Icon(
-                            isFavorited
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: isFavorited ? Colors.red : null,
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  child: InkWell(
+                    onTap: () => controller.handleSongTap(index),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: isDark
+                              ? [
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHighest,
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHigh,
+                                ]
+                              : [
+                                  Theme.of(context).colorScheme.surface,
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerLow,
+                                ],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context)
+                                .shadowColor
+                                .withAlpha(isDark ? 60 : 25),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                            offset: Offset(0, isDark ? 2 : 3),
                           ),
-                        );
-                      }),
-                      IconButton(
-                        icon: const Icon(Icons.play_arrow),
-                        onPressed: () => controller.handleSongTap(index),
+                          BoxShadow(
+                            color: Theme.of(context)
+                                .highlightColor
+                                .withAlpha(isDark ? 20 : 40),
+                            blurRadius: 0,
+                            spreadRadius: 0,
+                            offset: const Offset(0, -1),
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.more_vert),
-                        onPressed: () {
-                          showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return Container(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      leading:
-                                          const Icon(Icons.queue_play_next),
-                                      title: const Text('下一首播放'),
-                                      onTap: () {
-                                        controller.insertNextToPlay(index);
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ],
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer,
+                                  Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer
+                                      .withAlpha(180),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${index + 1}',
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            width: 52,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Theme.of(context)
+                                      .shadowColor
+                                      .withAlpha(40),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
                                 ),
-                              );
-                            },
-                          );
-                        },
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: coverUrl != null
+                                  ? CachedNetworkImage(
+                                      imageUrl: coverUrl,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Container(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surfaceContainerHighest,
+                                        child: Icon(
+                                          Icons.music_note_rounded,
+                                          size: 24,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surfaceContainerHighest,
+                                        child: Icon(
+                                          Icons.music_note_rounded,
+                                          size: 24,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainerHighest,
+                                      child: Icon(
+                                        Icons.music_note_rounded,
+                                        size: 24,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  song.songName ?? localizations.unknownSong,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 15,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  song.artistName ??
+                                      localizations.unknownArtist,
+                                  style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                    fontSize: 13,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Obx(() {
+                                final musicController =
+                                    Get.find<MusicController>();
+                                final isFavorited = musicController
+                                    .favoriteSongIds
+                                    .contains(song.id);
+
+                                return IconButton(
+                                  onPressed: () async {
+                                    final authController =
+                                        Get.find<AuthController>();
+
+                                    if (!authController.isAuthenticated) {
+                                      Get.snackbar(
+                                        localizations.tip,
+                                        localizations.pleaseLogin,
+                                        backgroundColor: Colors.blue,
+                                        colorText: Colors.white,
+                                        icon: Icon(Icons.info,
+                                            color: Colors.white),
+                                        duration: const Duration(seconds: 2),
+                                      );
+                                      Get.toNamed(AppRoutes.login);
+                                      return;
+                                    }
+
+                                    bool success;
+                                    if (isFavorited) {
+                                      success = await musicController
+                                          .removeFromFavorites(song);
+                                      if (success) {
+                                        SnackbarManager().showSnackbar(
+                                          title: localizations.success,
+                                          message: localizations
+                                              .removedFromFavoritesSuccess,
+                                          icon: Icon(Icons.check_circle,
+                                              color: Colors.white),
+                                          duration: const Duration(seconds: 2),
+                                        );
+                                      }
+                                    } else {
+                                      success = await musicController
+                                          .addToFavorites(song);
+                                      if (success) {
+                                        SnackbarManager().showSnackbar(
+                                          title: localizations.success,
+                                          message: localizations
+                                              .addedToFavoritesSuccess,
+                                          icon: Icon(Icons.check_circle,
+                                              color: Colors.white),
+                                          duration: const Duration(seconds: 2),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  icon: Icon(
+                                    isFavorited
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: isFavorited
+                                        ? Theme.of(context).colorScheme.error
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant,
+                                    size: 20,
+                                  ),
+                                  constraints: const BoxConstraints(
+                                      minWidth: 36, minHeight: 36),
+                                  padding: EdgeInsets.zero,
+                                );
+                              }),
+                              const SizedBox(width: 4),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.play_arrow_rounded,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 24,
+                                ),
+                                onPressed: () =>
+                                    controller.handleSongTap(index),
+                                constraints: const BoxConstraints(
+                                    minWidth: 36, minHeight: 36),
+                                padding: EdgeInsets.zero,
+                              ),
+                              const SizedBox(width: 4),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.more_vert_rounded,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(16)),
+                                    ),
+                                    builder: (context) => SafeArea(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            margin:
+                                                const EdgeInsets.only(top: 12),
+                                            width: 40,
+                                            height: 4,
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .outline
+                                                  .withAlpha(128),
+                                              borderRadius:
+                                                  BorderRadius.circular(2),
+                                            ),
+                                          ),
+                                          ListTile(
+                                            leading: const Icon(
+                                                Icons.queue_play_next_rounded),
+                                            title: Text(localizations.playNext),
+                                            onTap: () {
+                                              controller
+                                                  .insertNextToPlay(index);
+                                              Navigator.pop(context);
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                                constraints: const BoxConstraints(
+                                    minWidth: 36, minHeight: 36),
+                                padding: EdgeInsets.zero,
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 );
               },

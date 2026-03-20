@@ -194,7 +194,8 @@ class AudioPlayerService {
     // 监听音频时长变化
     _audioPlayer!.durationStream.listen((d) {
       AppLogger().d('durationStream 收到数据: $d');
-      if (d != null) {
+      // 只更新有效的时长（不为 null 且大于 0）
+      if (d != null && d > Duration.zero) {
         _duration = d;
         AppLogger().d('更新时长为: ${d.inMinutes}:${d.inSeconds % 60}');
         _durationStreamController.add(d);
@@ -300,7 +301,7 @@ class AudioPlayerService {
 
         // 设置单个音频源（带元数据）
         AppLogger().d('使用 just_audio 准备从URL播放音频');
-        await _audioPlayer!.setAudioSource(
+        final duration = await _audioPlayer!.setAudioSource(
           AudioSource.uri(
             Uri.parse(song.songUrl!),
             tag: MediaItem(
@@ -318,6 +319,17 @@ class AudioPlayerService {
         _playerState = AppPlayerState.playing;
         _playerStateStreamController.add(_playerState);
         AppLogger().d('使用 just_audio 成功开始播放歌曲: ${song.songName}');
+
+        // 更新时长
+        if (duration != null && duration > Duration.zero) {
+          _duration = duration;
+          _durationStreamController.add(duration);
+          AppLogger()
+              .d('从音频源获取时长: ${duration.inMinutes}:${duration.inSeconds % 60}');
+        } else {
+          // 从歌曲模型解析时长
+          _parseAndSetDuration(song.duration);
+        }
       } else {
         // 桌面端平台，使用 audioplayers 播放器
         await _playSongWithAudioPlayers(song);
@@ -327,6 +339,9 @@ class AudioPlayerService {
       AppLogger().e('堆栈跟踪: $stackTrace');
       _playerState = AppPlayerState.stopped;
       _playerStateStreamController.add(_playerState);
+
+      // 即使播放失败，也要设置时长，确保UI显示正常
+      _parseAndSetDuration(song.duration);
     }
   }
 
@@ -631,6 +646,69 @@ class AudioPlayerService {
     AppLogger().d('播放列表设置成功，当前歌曲: ${_playlist[startIndex].songName}');
   }
 
+  /// 从字符串解析时长并设置
+  void _parseAndSetDuration(String? durationStr) {
+    if (durationStr == null || durationStr.isEmpty) {
+      // 如果 duration 为空，设置一个默认值（3分钟）
+      _duration = Duration(minutes: 3);
+      _durationStreamController.add(_duration);
+      AppLogger().d('歌曲 duration 为空，设置默认时长: 3:00');
+      return;
+    }
+
+    final cleanDuration = durationStr.trim().replaceAll(' ', '');
+
+    // 处理时:分:秒格式（如：1:02:03）
+    final hhMmSsMatch =
+        RegExp(r'^(\d+):(\d+):(\d+(\.\d+)?)$').firstMatch(cleanDuration);
+    if (hhMmSsMatch != null) {
+      final hours = int.tryParse(hhMmSsMatch.group(1) ?? '0') ?? 0;
+      final minutes = int.tryParse(hhMmSsMatch.group(2) ?? '0') ?? 0;
+      final seconds =
+          double.tryParse(hhMmSsMatch.group(3) ?? '0')?.toInt() ?? 0;
+      _duration = Duration(hours: hours, minutes: minutes, seconds: seconds);
+      _durationStreamController.add(_duration);
+      AppLogger().d(
+          '从歌曲模型解析时长: ${_duration.inHours}:${_duration.inMinutes % 60}:${_duration.inSeconds % 60}');
+      return;
+    }
+
+    // 处理分:秒格式（如：2:03, 12:34）
+    final mmSsMatch =
+        RegExp(r'^(\d+):(\d+(\.\d+)?)$').firstMatch(cleanDuration);
+    if (mmSsMatch != null) {
+      final minutes = int.tryParse(mmSsMatch.group(1) ?? '0') ?? 0;
+      final seconds = double.tryParse(mmSsMatch.group(2) ?? '0')?.toInt() ?? 0;
+      _duration = Duration(minutes: minutes, seconds: seconds);
+      _durationStreamController.add(_duration);
+      AppLogger()
+          .d('从歌曲模型解析时长: ${_duration.inMinutes}:${_duration.inSeconds % 60}');
+      return;
+    }
+
+    // 处理秒数格式（如：123, 123.45）
+    if (RegExp(r'^\d+(\.\d+)?$').hasMatch(cleanDuration)) {
+      final seconds = double.tryParse(cleanDuration)?.toInt() ?? 0;
+      if (seconds > 0) {
+        _duration = Duration(seconds: seconds);
+        _durationStreamController.add(_duration);
+        AppLogger()
+            .d('从歌曲模型解析时长: ${_duration.inMinutes}:${_duration.inSeconds % 60}');
+      } else {
+        // 秒数为0，设置默认值
+        _duration = Duration(minutes: 3);
+        _durationStreamController.add(_duration);
+        AppLogger().d('歌曲 duration 无效，设置默认时长: 3:00');
+      }
+      return;
+    }
+
+    // 格式不正确，设置默认值
+    _duration = Duration(minutes: 3);
+    _durationStreamController.add(_duration);
+    AppLogger().d('歌曲 duration 格式不正确，设置默认时长: 3:00');
+  }
+
   /// 播放上一首
   Future<void> playPrevious() async {
     if (_playlist.isEmpty) return;
@@ -650,6 +728,89 @@ class AudioPlayerService {
       _currentIndex = (_currentIndex - 1 + _playlist.length) % _playlist.length;
       await playSong(_playlist[_currentIndex]);
     }
+  }
+
+  /// 设置播放列表但不播放
+  /// [playlist] 播放列表
+  /// [startIndex] 起始索引，默认为0
+  Future<void> setPlaylistWithoutPlaying(List<Song> playlist,
+      {int startIndex = 0}) async {
+    if (playlist.isEmpty) return;
+
+    _playlist = playlist;
+    _currentIndex = startIndex.clamp(0, playlist.length - 1);
+
+    // 检查是否为桌面端平台
+    final isDesktop = _isDesktop;
+
+    if (!isDesktop) {
+      await _preparePlaylistWithJustAudio(startIndex);
+    } else {
+      // 桌面端准备播放器
+      final song = playlist[startIndex];
+      await preparePlayer(song);
+    }
+  }
+
+  /// 使用 just_audio 准备播放列表但不播放
+  Future<void> _preparePlaylistWithJustAudio(int startIndex) async {
+    if (_audioPlayer == null || _playlist.isEmpty) {
+      throw Exception('音频播放器未初始化或播放列表为空');
+    }
+
+    // 创建音频源列表
+    final audioSources = _playlist.map((song) {
+      return AudioSource.uri(
+        Uri.parse(song.songUrl!),
+        tag: MediaItem(
+          id: song.id?.toString() ?? song.songUrl!,
+          album: song.albumName,
+          title: song.songName ?? '未知歌曲',
+          artist: song.artistName ?? '未知艺术家',
+          artUri: song.coverUrl != null ? Uri.parse(song.coverUrl!) : null,
+        ),
+      );
+    }).toList();
+
+    // 创建 ConcatenatingAudioSource 来支持上一首/下一首
+    final concatenatingSource = ConcatenatingAudioSource(
+      children: audioSources,
+      useLazyPreparation: false, // 禁用懒加载，确保音频源完全加载
+    );
+
+    AppLogger().d('准备播放列表大小: ${_playlist.length}, 起始索引: $startIndex');
+
+    // 重置播放器
+    await _audioPlayer!.stop();
+
+    // 设置循环模式为全部循环
+    await _audioPlayer!.setLoopMode(LoopMode.all);
+
+    // 设置音频源但不播放
+    final duration = await _audioPlayer!.setAudioSource(
+      concatenatingSource,
+      initialIndex: startIndex,
+      initialPosition: Duration.zero,
+    );
+
+    // 设置暂停状态
+    await _audioPlayer!.pause();
+    _playerState = AppPlayerState.paused;
+    _playerStateStreamController.add(_playerState);
+
+    // 如果 setAudioSource 返回了时长，使用它；否则从歌曲模型解析
+    if (duration != null && duration > Duration.zero) {
+      _duration = duration;
+      _durationStreamController.add(duration);
+      AppLogger()
+          .d('从音频源获取时长: ${duration.inMinutes}:${duration.inSeconds % 60}');
+    } else {
+      // 解析当前歌曲时长
+      final currentSong = _playlist[startIndex];
+      _parseAndSetDuration(currentSong.duration);
+    }
+
+    AppLogger().d('播放列表准备完成（未播放），当前歌曲: ${_playlist[startIndex].songName}');
   }
 
   /// 播放下一首

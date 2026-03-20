@@ -250,7 +250,7 @@ class _LoginViewState extends State<LoginView> {
 
                           // 密码输入框
                           Container(
-                            margin: const EdgeInsets.only(bottom: 24),
+                            margin: const EdgeInsets.only(bottom: 8),
                             decoration: BoxDecoration(
                               color: isDarkMode
                                   ? const Color(0xFF3A3A3A)
@@ -267,42 +267,72 @@ class _LoginViewState extends State<LoginView> {
                                       ),
                                     ],
                             ),
-                            child: TextFormField(
-                              controller: controller.passwordController,
-                              decoration: InputDecoration(
-                                labelText:
-                                    AppLocalizations.of(context)?.password ??
+                            child: Obx(() => TextFormField(
+                                  controller: controller.passwordController,
+                                  decoration: InputDecoration(
+                                    labelText: AppLocalizations.of(context)
+                                            ?.password ??
                                         'Password',
-                                prefixIcon: Icon(
-                                  Icons.lock,
-                                  color:
-                                      isDarkMode ? Colors.grey : Colors.black,
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                filled: true,
-                                fillColor: Colors.transparent,
-                              ),
-                              obscureText: true,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return AppLocalizations.of(context)
-                                          ?.enterPassword ??
-                                      'Please enter password';
-                                }
-                                // 密码强度校验
-                                final passwordRegex = RegExp(
-                                    r"^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z\\W]{8,18}$");
-                                if (!passwordRegex.hasMatch(value)) {
-                                  return AppLocalizations.of(context)
-                                          ?.passwordFormat ??
-                                      'Password must be 8-18 characters, contain at least one letter and one number, and can include special characters';
-                                }
-                                return null;
-                              },
-                            ),
+                                    prefixIcon: Icon(
+                                      Icons.lock,
+                                      color: isDarkMode
+                                          ? Colors.grey
+                                          : Colors.black,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.transparent,
+                                  ),
+                                  obscureText: !controller.showPassword.value,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return AppLocalizations.of(context)
+                                              ?.enterPassword ??
+                                          'Please enter password';
+                                    }
+                                    final passwordRegex = RegExp(
+                                        r"^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z\W]{8,18}$");
+                                    if (!passwordRegex.hasMatch(value)) {
+                                      return AppLocalizations.of(context)
+                                              ?.passwordFormat ??
+                                          'Password must be 8-18 characters, contain at least one letter and one number, and can include special characters';
+                                    }
+                                    return null;
+                                  },
+                                )),
+                          ),
+
+                          // 显示密码复选框
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: Obx(() => Row(
+                                  children: [
+                                    Checkbox(
+                                      value: controller.showPassword.value,
+                                      onChanged: (value) {
+                                        controller.togglePasswordVisibility();
+                                      },
+                                      activeColor: const Color(0xFF6D28D9),
+                                    ),
+                                    GestureDetector(
+                                      onTap:
+                                          controller.togglePasswordVisibility,
+                                      child: Text(
+                                        AppLocalizations.of(context)
+                                                ?.showPassword ??
+                                            'Show Password',
+                                        style: TextStyle(
+                                          color: isDarkMode
+                                              ? Colors.grey
+                                              : Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )),
                           ),
 
                           // 登录按钮

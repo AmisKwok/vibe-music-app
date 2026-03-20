@@ -13,7 +13,7 @@
 /// // 获取格式化信息
 /// String formattedInfo = await DeviceInfoManager.getFormattedDeviceInfo();
 /// ```
-library device_info_utils;
+library;
 
 export 'android_device_info.dart';
 export 'ios_device_info.dart';

@@ -393,6 +393,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get hotSongs => '热门歌曲';
+
+  @override
+  String get playlistDetail => '歌单详情';
+
+  @override
+  String get playAll => '播放全部';
+
+  @override
+  String get removedFromFavoritesSuccess => '已取消收藏';
+
+  @override
+  String get addedToFavoritesSuccess => '已添加到收藏';
+
+  @override
+  String get showPassword => '显示密码';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -784,4 +799,19 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get hotSongs => '熱門歌曲';
+
+  @override
+  String get playlistDetail => '歌單詳情';
+
+  @override
+  String get playAll => '播放全部';
+
+  @override
+  String get removedFromFavoritesSuccess => '已取消收藏';
+
+  @override
+  String get addedToFavoritesSuccess => '已添加到收藏';
+
+  @override
+  String get showPassword => '顯示密碼';
 }

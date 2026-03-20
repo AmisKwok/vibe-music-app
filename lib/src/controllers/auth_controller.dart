@@ -236,27 +236,31 @@ class AuthController extends GetxController {
           await _sendDeviceInfo();
 
           _status.value = AuthStatus.authenticated;
+          _errorMessage.value = null;
           AppLogger().d('🎉 登录流程完成，状态更新为已认证');
           // 通知监听器认证状态已变化
           update();
           return true;
         } else {
-          _errorMessage.value =
-              '服务器响应: code=${data['code']}, message=${data['message']}';
+          final message = data['message'] ?? '登录失败';
+          _errorMessage.value = message;
           AppLogger().e('❌ 登录失败: ${_errorMessage.value}');
           _status.value = AuthStatus.unauthenticated;
+          update();
           return false;
         }
       } else {
         _errorMessage.value = '网络错误: ${response.statusCode}';
         AppLogger().e('❌ 网络错误: ${_errorMessage.value}');
         _status.value = AuthStatus.unauthenticated;
+        update();
         return false;
       }
     } catch (e) {
       _errorMessage.value = '连接错误: $e';
       AppLogger().e('❌ 连接错误: ${_errorMessage.value}');
       _status.value = AuthStatus.unauthenticated;
+      update();
       return false;
     }
   }
@@ -399,6 +403,7 @@ class AuthController extends GetxController {
   /// 清除错误信息
   void clearError() {
     _errorMessage.value = null;
+    update();
   }
 
   /// 记录SpUtil存储状态

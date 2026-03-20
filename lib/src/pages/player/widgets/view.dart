@@ -44,7 +44,6 @@ class PlayerView extends GetView<PlayerController> {
 
   Widget _buildMusikePlayer(BuildContext context) {
     final textColor = const Color(0xFF1F2937);
-    final subTextColor = const Color(0xFF6B7280);
 
     return Stack(
       children: [
@@ -212,26 +211,39 @@ class PlayerView extends GetView<PlayerController> {
                 ],
               ),
               Obx(() =>
-                  controller.isExpanded.value && controller.playlist.isNotEmpty
+                  controller.playlist.isNotEmpty && controller.isExpanded.value
                       ? Positioned.fill(
                           child: GestureDetector(
                             onTap: controller.togglePlaylistExpanded,
-                            child: Container(
-                              color: Colors.transparent,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeOutCubic,
+                              color: Colors.black.withAlpha(80),
                             ),
                           ),
                         )
                       : const SizedBox()),
-              Obx(() => controller.isExpanded.value &&
-                      controller.playlist.isNotEmpty
-                  ? PlayerPlaylist(
-                      playlist: controller.playlist,
-                      currentIndex: controller.currentIndex,
-                      onSongTap: controller.playSongAtIndex,
-                      onToggleFavorite: controller.handlePlaylistFavoriteToggle,
-                      isSongFavorited: controller.isSongFavorited,
-                      onRemoveSong: controller.removeFromPlaylist,
-                      onClearPlaylist: controller.clearPlaylist,
+              Obx(() => controller.playlist.isNotEmpty
+                  ? AnimatedPositioned(
+                      left: 0,
+                      right: 0,
+                      bottom: controller.isExpanded.value
+                          ? 0
+                          : -MediaQuery.of(context).size.height * 0.65,
+                      height: MediaQuery.of(context).size.height * 0.65,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutCubic,
+                      child: PlayerPlaylist(
+                        playlist: controller.playlist,
+                        currentIndex: controller.currentIndex,
+                        onSongTap: controller.playSongAtIndex,
+                        onToggleFavorite:
+                            controller.handlePlaylistFavoriteToggle,
+                        isSongFavorited: controller.isSongFavorited,
+                        onRemoveSong: controller.removeFromPlaylist,
+                        onClearPlaylist: controller.clearPlaylist,
+                        onClose: controller.togglePlaylistExpanded,
+                      ),
                     )
                   : const SizedBox()),
             ],
@@ -347,28 +359,40 @@ class PlayerView extends GetView<PlayerController> {
             ),
           ),
           Obx(() =>
-              controller.isExpanded.value && controller.playlist.isNotEmpty
+              controller.playlist.isNotEmpty && controller.isExpanded.value
                   ? Positioned.fill(
                       child: GestureDetector(
                         onTap: controller.togglePlaylistExpanded,
-                        child: Container(
-                          color: Colors.transparent,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOutCubic,
+                          color: Colors.black.withAlpha(80),
                         ),
                       ),
                     )
                   : const SizedBox()),
-          Obx(() =>
-              controller.isExpanded.value && controller.playlist.isNotEmpty
-                  ? PlayerPlaylist(
-                      playlist: controller.playlist,
-                      currentIndex: controller.currentIndex,
-                      onSongTap: controller.playSongAtIndex,
-                      onToggleFavorite: controller.handlePlaylistFavoriteToggle,
-                      isSongFavorited: controller.isSongFavorited,
-                      onRemoveSong: controller.removeFromPlaylist,
-                      onClearPlaylist: controller.clearPlaylist,
-                    )
-                  : const SizedBox()),
+          Obx(() => controller.playlist.isNotEmpty
+              ? AnimatedPositioned(
+                  left: 0,
+                  right: 0,
+                  bottom: controller.isExpanded.value
+                      ? 0
+                      : -MediaQuery.of(context).size.height * 0.65,
+                  height: MediaQuery.of(context).size.height * 0.65,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeOutCubic,
+                  child: PlayerPlaylist(
+                    playlist: controller.playlist,
+                    currentIndex: controller.currentIndex,
+                    onSongTap: controller.playSongAtIndex,
+                    onToggleFavorite: controller.handlePlaylistFavoriteToggle,
+                    isSongFavorited: controller.isSongFavorited,
+                    onRemoveSong: controller.removeFromPlaylist,
+                    onClearPlaylist: controller.clearPlaylist,
+                    onClose: controller.togglePlaylistExpanded,
+                  ),
+                )
+              : const SizedBox()),
         ],
       ),
     );
@@ -385,25 +409,40 @@ class PlayerView extends GetView<PlayerController> {
     return Stack(
       children: [
         mainContent,
-        Obx(() => controller.isExpanded.value && controller.playlist.isNotEmpty
+        Obx(() => controller.playlist.isNotEmpty
             ? Positioned.fill(
                 child: GestureDetector(
                   onTap: controller.togglePlaylistExpanded,
-                  child: Container(
-                    color: Colors.transparent,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    color: controller.isExpanded.value
+                        ? Colors.black.withAlpha(80)
+                        : Colors.transparent,
                   ),
                 ),
               )
             : const SizedBox()),
-        Obx(() => controller.isExpanded.value && controller.playlist.isNotEmpty
-            ? PlayerPlaylist(
-                playlist: controller.playlist,
-                currentIndex: controller.currentIndex,
-                onSongTap: controller.playSongAtIndex,
-                onToggleFavorite: controller.handlePlaylistFavoriteToggle,
-                isSongFavorited: controller.isSongFavorited,
-                onRemoveSong: controller.removeFromPlaylist,
-                onClearPlaylist: controller.clearPlaylist,
+        Obx(() => controller.playlist.isNotEmpty
+            ? AnimatedPositioned(
+                left: 0,
+                right: 0,
+                bottom: controller.isExpanded.value
+                    ? 0
+                    : -MediaQuery.of(context).size.height * 0.65,
+                height: MediaQuery.of(context).size.height * 0.65,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                child: PlayerPlaylist(
+                  playlist: controller.playlist,
+                  currentIndex: controller.currentIndex,
+                  onSongTap: controller.playSongAtIndex,
+                  onToggleFavorite: controller.handlePlaylistFavoriteToggle,
+                  isSongFavorited: controller.isSongFavorited,
+                  onRemoveSong: controller.removeFromPlaylist,
+                  onClearPlaylist: controller.clearPlaylist,
+                  onClose: controller.togglePlaylistExpanded,
+                ),
               )
             : const SizedBox()),
       ],

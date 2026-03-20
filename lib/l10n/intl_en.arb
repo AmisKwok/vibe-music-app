@@ -125,5 +125,10 @@
   "goToLogin": "Go to login",
   "recommendedPlaylists": "Recommended Playlists",
   "viewMore": "View More",
-  "hotSongs": "Hot Songs"
+  "hotSongs": "Hot Songs",
+  "playlistDetail": "Playlist Detail",
+  "playAll": "Play All",
+  "removedFromFavoritesSuccess": "Removed from favorites",
+  "addedToFavoritesSuccess": "Added to favorites",
+  "showPassword": "Show Password"
 }

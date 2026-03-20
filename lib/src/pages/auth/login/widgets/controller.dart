@@ -15,6 +15,7 @@ class LoginController extends GetxController {
 
   // 状态
   var isLoading = false.obs;
+  var showPassword = false.obs;
 
   // 认证提供者
   late AuthController _authController;
@@ -38,12 +39,19 @@ class LoginController extends GetxController {
     super.onClose();
   }
 
+  /// 切换密码可见性
+  void togglePasswordVisibility() {
+    showPassword.value = !showPassword.value;
+  }
+
   /// 处理登录
   Future<void> handleLogin() async {
     if (formKey.currentState?.validate() ?? false) {
       isLoading.value = true;
 
       try {
+        _authController.clearError();
+
         final success = await _authController.login(
           usernameOrEmailController.text,
           passwordController.text,
@@ -51,10 +59,8 @@ class LoginController extends GetxController {
 
         final localizations = AppLocalizations.of(Get.context!);
         if (success) {
-          // 登录成功，跳转到首页
           Get.offAllNamed(AppRoutes.home);
         } else if (_authController.errorMessage != null) {
-          // 登录失败，显示错误信息
           Get.snackbar(
               localizations?.error ?? 'Error', _authController.errorMessage!);
         }

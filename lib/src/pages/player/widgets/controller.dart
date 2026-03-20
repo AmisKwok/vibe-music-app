@@ -300,7 +300,7 @@ class PlayerController extends GetxController {
 
   /// 获取播放列表
   List<Song> get playlist {
-    return _playlist.value;
+    return _playlist;
   }
 
   /// 获取当前播放索引

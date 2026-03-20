@@ -18,13 +18,13 @@ class FavoriteService {
 
   /// 收藏操作节流控制
   final _favoriteOperation = false.obs;
-  
+
   /// 收藏操作节流延迟时间
   static const int throttleDelay = 500; // 收藏操作节流延迟时间
 
   /// 缓存过期时间（分钟）
-  static const int CACHE_EXPIRY_MINUTES = 5;
-  
+  static const int cacheExpiryMinutes = 5;
+
   /// 单例实例
   static final FavoriteService _instance = FavoriteService._internal();
 
@@ -45,7 +45,7 @@ class FavoriteService {
 
     final now = DateTime.now();
     final cacheAge = now.difference(_favoriteSongsCacheTimestamp!);
-    return cacheAge.inMinutes < CACHE_EXPIRY_MINUTES;
+    return cacheAge.inMinutes < cacheExpiryMinutes;
   }
 
   /// 更新收藏歌曲缓存

@@ -17,13 +17,24 @@ class WebDeviceInfo {
     final browserName = _webBrowserInfo?.browserName.name;
     final ua = browserName ?? 'Unknown Browser';
     AppLogger().d('ua: $ua');
-    if (ua.contains('chrome') && !ua.contains('edg')) return 'Chrome';
-    if (ua.contains('firefox')) return 'Firefox';
-    if (ua.contains('safari') && !ua.contains('chrome')) return 'Safari';
-    if (ua.contains('edg')) return 'Edge';
-    if (ua.contains('opera') || ua.contains('opr')) return 'Opera';
-    if (ua.contains('trident') || ua.contains('msie'))
+    if (ua.contains('chrome') && !ua.contains('edg')) {
+      return 'Chrome';
+    }
+    if (ua.contains('firefox')) {
+      return 'Firefox';
+    }
+    if (ua.contains('safari') && !ua.contains('chrome')) {
+      return 'Safari';
+    }
+    if (ua.contains('edg')) {
+      return 'Edge';
+    }
+    if (ua.contains('opera') || ua.contains('opr')) {
+      return 'Opera';
+    }
+    if (ua.contains('trident') || ua.contains('msie')) {
       return 'Internet Explorer';
+    }
     return '未知浏览器';
   }
 

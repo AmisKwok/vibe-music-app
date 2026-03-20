@@ -6,7 +6,7 @@ import 'package:vibe_music_app/src/pages/home/widgets/controller.dart';
 import 'package:vibe_music_app/src/routes/app_routes.dart';
 import 'package:vibe_music_app/src/utils/glass_morphism/responsive_layout.dart';
 import 'package:vibe_music_app/src/utils/glass_morphism/sidebar_navigation.dart';
-import 'package:vibe_music_app/src/pages/home/components/song_list_page.dart';
+import 'package:vibe_music_app/src/pages/home/components/home_content_page.dart';
 import 'package:vibe_music_app/src/pages/home/components/profile_page.dart';
 import 'package:vibe_music_app/src/theme/app_theme.dart';
 import 'package:vibe_music_app/src/pages/home/components/currently_playing_bar.dart';
@@ -141,7 +141,7 @@ class HomeView extends GetView<HomeController> {
     return Scaffold(
       backgroundColor: isMusikeTheme
           ? AppTheme.musikeBackground
-          : Theme.of(context).colorScheme.background,
+          : Theme.of(context).colorScheme.surface,
       body: isGlassMorphism
           ? Container(
               decoration: BoxDecoration(
@@ -224,7 +224,7 @@ class HomeView extends GetView<HomeController> {
     return Scaffold(
       backgroundColor: isMusikeTheme
           ? AppTheme.musikeBackground
-          : Theme.of(context).colorScheme.background,
+          : Theme.of(context).colorScheme.surface,
       body: isGlassMorphism
           ? Container(
               decoration: BoxDecoration(
@@ -347,7 +347,7 @@ class HomeView extends GetView<HomeController> {
     return IndexedStack(
       index: controller.currentPage.value,
       children: [
-        const SongListPage(),
+        const HomeContentPage(),
         const PlayerPage(),
         const FavoritesPage(),
         const ProfilePage(),

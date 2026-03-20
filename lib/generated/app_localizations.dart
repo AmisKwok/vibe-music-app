@@ -854,6 +854,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hot Songs'**
   String get hotSongs;
+
+  /// No description provided for @playlistDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist Detail'**
+  String get playlistDetail;
+
+  /// No description provided for @playAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Play All'**
+  String get playAll;
+
+  /// No description provided for @removedFromFavoritesSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from favorites'**
+  String get removedFromFavoritesSuccess;
+
+  /// No description provided for @addedToFavoritesSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Added to favorites'**
+  String get addedToFavoritesSuccess;
+
+  /// No description provided for @showPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Password'**
+  String get showPassword;
 }
 
 class _AppLocalizationsDelegate
